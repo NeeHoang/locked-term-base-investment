@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: locked-investment-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/locked_investment_db
+    username: investment
+    password: 123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
