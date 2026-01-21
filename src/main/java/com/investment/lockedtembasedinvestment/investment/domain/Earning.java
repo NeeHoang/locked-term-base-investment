@@ -1,20 +1,23 @@
-package com.investment.lockedtembasedinvestment.module.investment.domain;
+package com.investment.lockedtembasedinvestment.investment.domain;
+
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Getter
 public class Earning {
 
     private final Long id;
     private final Long subscriptionId;
 
-    private BigDecimal principal;
+    private final BigDecimal principal;
     private BigDecimal available;
     private BigDecimal totalInterest;
     private BigDecimal penaltyAmount;
     private BigDecimal progress;
     private BigDecimal penaltyRate;
-    private BigDecimal interestPerDay;
+    private final BigDecimal interestPerDay;
 
     private int holdingDay;
     private final int termDay;
@@ -65,10 +68,10 @@ public class Earning {
 
     // Domain behaviors
 
-    public void accrueDailyInterest(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) return;
+    public void accrueDailyInterest() {
+        if (this.interestPerDay.compareTo(BigDecimal.ZERO) <= 0) return;
 
-        this.totalInterest = this.totalInterest.add(amount);
-
+        this.totalInterest = this.totalInterest.add(this.interestPerDay);
+        this.available = this.available.add(this.interestPerDay);
     }
 }
