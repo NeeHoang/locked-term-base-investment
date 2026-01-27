@@ -1,11 +1,11 @@
-package com.investment.lockedtembasedinvestment.investment.infrastructure.persistence;
+package com.investment.lockedtembasedinvestment.saving.infrastructure.persistence;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "earnings")
@@ -38,11 +38,11 @@ public class EarningEntity {
     @Column(name = "progress", precision = 5, scale = 2, nullable = false)
     private BigDecimal progress;
 
-    @Column(name = "progress", precision = 5, scale = 2, nullable = false)
-    private BigDecimal penalty_rate;
+    @Column(name = "penalty_rate", precision = 5, scale = 2, nullable = false)
+    private BigDecimal penaltyRate;
 
-    @Column(name = "progress", precision = 5, scale = 2, nullable = false)
-    private BigDecimal penalty_amount;
+    @Column(name = "penalty_amount", precision = 5, scale = 2, nullable = false)
+    private BigDecimal penaltyAmount;
 
     @Column(name = "holding_days", nullable = false)
     private int holdingDays;
@@ -51,9 +51,9 @@ public class EarningEntity {
     private int termDays;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
 }

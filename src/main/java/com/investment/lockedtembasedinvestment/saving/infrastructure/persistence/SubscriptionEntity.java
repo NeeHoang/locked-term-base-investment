@@ -1,10 +1,10 @@
-package com.investment.lockedtembasedinvestment.investment.infrastructure.persistence;
+package com.investment.lockedtembasedinvestment.saving.infrastructure.persistence;
 
 import com.investment.lockedtembasedinvestment.enums.SubscriptionStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -44,9 +44,9 @@ public class SubscriptionEntity {
     private BigDecimal totalInterest;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }
 

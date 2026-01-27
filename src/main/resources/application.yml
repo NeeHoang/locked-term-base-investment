@@ -1,10 +1,10 @@
 spring:
   application:
-    name: locked-investment-service
+    name: locked-saving-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/locked_investment_db
-    username: investment
+    url: jdbc:postgresql://localhost:5432/locked_saving_db
+    username: saving
     password: 123
     driver-class-name: org.postgresql.Driver
 

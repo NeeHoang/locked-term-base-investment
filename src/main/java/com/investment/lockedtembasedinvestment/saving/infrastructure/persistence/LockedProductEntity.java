@@ -1,11 +1,11 @@
-package com.investment.lockedtembasedinvestment.investment.infrastructure.persistence;
+package com.investment.lockedtembasedinvestment.saving.infrastructure.persistence;
 
 import com.investment.lockedtembasedinvestment.enums.LockedProductStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "locked_products")
@@ -43,8 +43,8 @@ public class LockedProductEntity {
     private BigDecimal totalQuota;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }

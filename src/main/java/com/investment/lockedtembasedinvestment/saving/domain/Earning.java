@@ -1,9 +1,9 @@
-package com.investment.lockedtembasedinvestment.investment.domain;
+package com.investment.lockedtembasedinvestment.saving.domain;
 
 import lombok.Getter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 public class Earning {
@@ -22,16 +22,16 @@ public class Earning {
     private int holdingDay;
     private final int termDay;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
     // Map 1-1 subscription, generate 1 Earning
-    public Earning(Long subscriptionId, int termDay, LocalDateTime createdAt,
+    public Earning(Long subscriptionId, int termDay, Instant createdAt,
                    BigDecimal principal, BigDecimal interestPerDay) {
         this.id = null;
         this.subscriptionId = subscriptionId;
         this.termDay = termDay;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
         this.principal = principal;
         this.interestPerDay = interestPerDay;
 
@@ -43,14 +43,14 @@ public class Earning {
 
         this.holdingDay = 0;
 
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 
     // Reconstitute DataBase
     public Earning(Long id, Long subscriptionId, int termDay, BigDecimal principal,
                    BigDecimal available, BigDecimal totalInterest, BigDecimal penaltyAmount,
                    BigDecimal progress, BigDecimal penaltyRate, BigDecimal interestPerDay,
-                   int holdingDay, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                   int holdingDay, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.subscriptionId = subscriptionId;
         this.termDay = termDay;

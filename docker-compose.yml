@@ -3,21 +3,21 @@ version: "3.8"
 services:
   postgres:
     image: postgres:15
-    container_name: postgres_locked_investment
+    container_name: postgres_locked_saving
     environment:
-      POSTGRES_DB: locked_investment_db
-      POSTGRES_USER: investment
+      POSTGRES_DB: locked_saving_db
+      POSTGRES_USER: saving
       POSTGRES_PASSWORD: 123
 
     ports:
       - "5432:5432"
     volumes:
-      - locked_investment_postgres_data:/var/lib/postgresql/data
+      - locked_saving_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U investment"]
+      test: ["CMD-SHELL", "pg_isready -U saving"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-  locked_investment_postgres_data:
+  locked_saving_postgres_data:
