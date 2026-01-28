@@ -1,4 +1,4 @@
-package com.investment.lockedtembasedinvestment.enums;
+package com.investment.lockedtembasedinvestment.common.enums;
 
 public enum LiquidityTransactionType {
     DAILY_INTEREST,

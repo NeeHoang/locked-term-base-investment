@@ -1,4 +1,4 @@
-package com.investment.lockedtembasedinvestment.common;
+package com.investment.lockedtembasedinvestment.common.sharekernel;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -58,8 +58,6 @@ public record Money(BigDecimal amount) {
         requireNonNull(other);
         return this.amount.compareTo(other.amount) >= 0;
     }
-
-    /* ========= INFRASTRUCTURE SUPPORT ========= */
 
     public BigDecimal toBigDecimal() {
         return amount;
