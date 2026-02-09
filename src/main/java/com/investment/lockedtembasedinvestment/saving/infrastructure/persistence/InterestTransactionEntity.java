@@ -29,4 +29,9 @@ public class InterestTransactionEntity {
 
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+    }
 }

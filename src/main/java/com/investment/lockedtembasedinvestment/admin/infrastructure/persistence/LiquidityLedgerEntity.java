@@ -1,6 +1,6 @@
 package com.investment.lockedtembasedinvestment.admin.infrastructure.persistence;
 
-import com.investment.lockedtembasedinvestment.enums.LiquidityTransactionType;
+import com.investment.lockedtembasedinvestment.common.enums.LiquidityTransactionType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +15,8 @@ import java.time.Instant;
 public class LiquidityLedgerEntity {
 
     @Id
-    @Column(name = "tx_id", columnDefinition = "BYTEA", nullable = false)
-    private byte[] txId; // ULID
+    @Column(name = "tx_id", columnDefinition = "BYTEA", nullable = false, updatable = false)
+    private byte[] txId; // ULID 16 byte
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tx_type", nullable = false, length = 50)

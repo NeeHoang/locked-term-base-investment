@@ -1,16 +1,16 @@
 package com.investment.lockedtembasedinvestment.saving.infrastructure.persistence;
 
-import com.investment.lockedtembasedinvestment.enums.LockedProductStatus;
+import com.investment.lockedtembasedinvestment.common.enums.LockedProductStatus;
+import com.investment.lockedtembasedinvestment.common.persistence.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Entity
 @Table(name = "locked_products")
 @Getter @Setter
-public class LockedProductEntity {
+public class LockedProductEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,10 +41,4 @@ public class LockedProductEntity {
 
     @Column(name = "total_quota", precision = 18, scale = 8)
     private BigDecimal totalQuota;
-
-    @Column(name = "created_at", updatable = false)
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
 }

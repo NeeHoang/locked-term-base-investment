@@ -1,6 +1,7 @@
 package com.investment.lockedtembasedinvestment.saving.infrastructure.persistence;
 
-import com.investment.lockedtembasedinvestment.enums.EarningTxType;
+import com.investment.lockedtembasedinvestment.common.enums.EarningTransaction;
+import com.investment.lockedtembasedinvestment.common.enums.EarningTxType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "earning_transactions")
@@ -18,9 +18,8 @@ import java.time.LocalDateTime;
 public class EarningTransactionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tx_id")
-    private Long txId;
+    @Column(name = "tx_id", nullable = false, updatable = false, columnDefinition = "BYTEA")
+    private byte[] txId; // ULID 16 bytes
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "earning_id", nullable = false)
@@ -29,6 +28,10 @@ public class EarningTransactionEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "tx_type", nullable = false)
     private EarningTxType txType; // DAILY_INTEREST, EARLY_REDEEMED, REDEEMED
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private EarningTransaction status; //PENDING, SUCCESS, FAILED
 
     @Column(name = "available_before", nullable = false, precision = 18, scale = 8)
     private BigDecimal availableBefore;
@@ -41,4 +44,9 @@ public class EarningTransactionEntity {
 
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+    }
 }
