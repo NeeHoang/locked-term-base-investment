@@ -1,6 +1,6 @@
 package com.investment.lockedtembasedinvestment.wallet.mapper;
 
-import com.investment.lockedtembasedinvestment.common.Money;
+import com.investment.lockedtembasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtembasedinvestment.wallet.domain.aggregate.WalletAggregate;
 import com.investment.lockedtembasedinvestment.wallet.domain.valueobject.WalletId;
 import com.investment.lockedtembasedinvestment.wallet.infrastructure.persistence.WalletEntity;
@@ -19,11 +19,15 @@ public class WalletMapper {
 
     public static WalletEntity toEntity(WalletAggregate wallet) {
         WalletEntity entity = new WalletEntity();
-        entity.setWalletId(wallet.getId().getValue()); // null khi insert
+
+        if (wallet.getId() != null) {
+            entity.setWalletId(wallet.getId().value());
+        }
         entity.setTotalBalance(wallet.getTotalBalance().toBigDecimal());
         entity.setBalanceAvailable(wallet.getBalanceAvailable().toBigDecimal());
         entity.setBalanceFrozen(wallet.getBalanceFrozen().toBigDecimal());
         entity.setStatus(wallet.getStatus());
+
         return entity;
     }
 

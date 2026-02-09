@@ -9,5 +9,5 @@ public interface WalletRepository {
 
     Optional<WalletAggregate> findById(WalletId id);
 
-    WalletAggregate save(WalletAggregate wallet);
+    void save(WalletAggregate wallet);
 }

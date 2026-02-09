@@ -1,7 +1,7 @@
 package com.investment.lockedtembasedinvestment.wallet.domain.factory;
 
-import com.investment.lockedtembasedinvestment.common.Money;
-import com.investment.lockedtembasedinvestment.enums.WalletStatus;
+import com.investment.lockedtembasedinvestment.common.sharekernel.Money;
+import com.investment.lockedtembasedinvestment.common.enums.WalletStatus;
 import com.investment.lockedtembasedinvestment.wallet.domain.aggregate.WalletAggregate;
 
 public class WalletFactory {
