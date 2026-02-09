@@ -1,24 +1,24 @@
 package com.investment.lockedtembasedinvestment.saving.infrastructure.persistence;
 
-import com.investment.lockedtembasedinvestment.enums.SubscriptionStatus;
+import com.investment.lockedtembasedinvestment.common.enums.SubscriptionStatus;
+import com.investment.lockedtembasedinvestment.common.persistence.AuditableEntity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "subscriptions")
 @Getter @Setter
-public class SubscriptionEntity {
+public class SubscriptionEntity extends AuditableEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "subscription_id")
-    private Long subscriptionId;
+    private UUID subscriptionId;
 
     @Column(name = "wallet_id", nullable = false)
     private Long walletId; // Chỉ lưu ID vì Wallet thuộc Bounded Context khác
@@ -42,11 +42,5 @@ public class SubscriptionEntity {
 
     @Column(name = "total_interest", precision = 18, scale = 8)
     private BigDecimal totalInterest;
-
-    @Column(name = "created_at", updatable = false)
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
 }
 
