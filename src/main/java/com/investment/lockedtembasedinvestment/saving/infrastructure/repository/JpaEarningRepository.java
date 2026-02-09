@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EarningRepository extends JpaRepository<EarningEntity, Long> {
+public interface JpaEarningRepository extends JpaRepository<EarningEntity, Long> {
 }

@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InterestTransactionRepository extends JpaRepository<InterestTransactionEntity, Long> {
+public interface JpaInterestTransactionRepository extends JpaRepository<InterestTransactionEntity, Long> {
 }
