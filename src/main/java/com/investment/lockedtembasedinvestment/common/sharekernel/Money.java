@@ -59,6 +59,24 @@ public record Money(BigDecimal amount) {
         return this.amount.compareTo(other.amount) >= 0;
     }
 
+    public boolean isGreaterThan(Money other) {
+        requireNonNull(other);
+        return this.amount.compareTo(other.amount) > 0;
+    }
+
+    public boolean isLessThan(Money other) {
+        requireNonNull(other);
+        return this.amount.compareTo(other.amount) < 0;
+    }
+
+    public boolean isNegative() {
+        return this.amount.compareTo(BigDecimal.ZERO) < 0;
+    }
+
+    public boolean isZero() {
+        return this.amount.compareTo(BigDecimal.ZERO) == 0;
+    }
+
     public BigDecimal toBigDecimal() {
         return amount;
     }
