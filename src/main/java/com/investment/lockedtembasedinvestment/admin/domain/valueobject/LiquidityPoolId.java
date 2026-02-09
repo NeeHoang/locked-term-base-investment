@@ -1,5 +1,8 @@
 package com.investment.lockedtembasedinvestment.admin.domain.valueobject;
 
+import com.github.f4b6a3.ulid.Ulid;
+import com.github.f4b6a3.ulid.UlidCreator;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -15,8 +18,23 @@ public record LiquidityPoolId(byte[] value) {
             );
         }
 
-        // Defensive copy – cực kỳ quan trọng
+        // Defensive copy
         value = Arrays.copyOf(value, value.length);
+    }
+
+    public static LiquidityPoolId generate() {
+        return new LiquidityPoolId(
+                UlidCreator.getUlid().toBytes()
+        );
+    }
+
+    public String toUlidString() {
+        return Ulid.from(value).toString();
+    }
+
+
+    public static LiquidityPoolId of(byte[] value) {
+        return new LiquidityPoolId(value);
     }
 
     public byte[] bytes() {

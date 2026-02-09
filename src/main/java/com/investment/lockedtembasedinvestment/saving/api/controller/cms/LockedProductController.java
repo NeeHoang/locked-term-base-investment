@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/cms/locked-products")
 @RequiredArgsConstructor
-public class CMSLockedProductController {
+public class LockedProductController {
 
     private final LockedProductService service;
 

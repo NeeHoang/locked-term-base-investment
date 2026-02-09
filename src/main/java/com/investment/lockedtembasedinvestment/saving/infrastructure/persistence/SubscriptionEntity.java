@@ -21,7 +21,7 @@ public class SubscriptionEntity extends AuditableEntity {
     private UUID subscriptionId;
 
     @Column(name = "wallet_id", nullable = false)
-    private Long walletId; // Chỉ lưu ID vì Wallet thuộc Bounded Context khác
+    private UUID walletId; // Chỉ lưu ID vì Wallet thuộc Bounded Context khác
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)

@@ -29,12 +29,6 @@ public class WalletRepositoryImpl implements WalletRepository {
     public void save(WalletAggregate aggregate) {
 
         WalletEntity entity = WalletMapper.toEntity(aggregate);
-        WalletEntity saved = jpaRepository.save(entity);
-
-        if (aggregate.getId() == null) {
-            aggregate.assignId(
-                    new WalletId(saved.getWalletId())
-            );
-        }
+        jpaRepository.save(entity);
     }
 }

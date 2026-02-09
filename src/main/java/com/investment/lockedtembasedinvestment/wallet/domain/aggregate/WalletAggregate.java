@@ -10,24 +10,34 @@ import lombok.Getter;
 @Getter
 public class WalletAggregate {
 
-    private WalletId id;
+    private final WalletId id;
     private Money totalBalance;
     private Money balanceAvailable;
     private Money balanceFrozen;
-
     private WalletStatus status;
 
-
-    public void assignId(WalletId id) {
-        if (this.id != null) {
-            throw new IllegalStateException("WalletId already assigned"); }
+    public WalletAggregate(
+            WalletId id,
+            Money totalBalance,
+            Money balanceAvailable,
+            Money balanceFrozen,
+            WalletStatus status
+    ) {
+        if (id == null) {
+            throw new IllegalArgumentException("WalletId cannot be null");
+        }
         this.id = id;
+        this.totalBalance = totalBalance;
+        this.balanceAvailable = balanceAvailable;
+        this.balanceFrozen = balanceFrozen;
+        this.status = status;
+        checkTotal();
     }
 
     private void checkTotal() {
         if (!totalBalance.equals(balanceAvailable.add(balanceFrozen))) {
             throw new WalletException(
-                    "Total balance are not equal to the sum of available balance and frozen balance",
+                    "Total balance mismatch",
                     WalletErrorCode.TOTAL_BALANCE_MISMATCH
             );
         }
@@ -58,15 +68,6 @@ public class WalletAggregate {
 
         this.balanceFrozen = balanceFrozen.subtract(amount);
         this.balanceAvailable = balanceAvailable.add(amount);
-        checkTotal();
-    }
-
-    public WalletAggregate(WalletId id, Money totalBalance, Money balanceAvailable, Money balanceFrozen, WalletStatus status) {
-        this.id = id;
-        this.totalBalance = totalBalance;
-        this.balanceAvailable = balanceAvailable;
-        this.balanceFrozen = balanceFrozen;
-        this.status = status;
         checkTotal();
     }
 }

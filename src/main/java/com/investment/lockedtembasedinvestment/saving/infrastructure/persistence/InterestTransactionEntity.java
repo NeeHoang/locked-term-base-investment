@@ -13,9 +13,8 @@ import java.time.LocalDate;
 public class InterestTransactionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tx_id")
-    private Long txId;
+    @Column(name = "tx_id", nullable = false, updatable = false, columnDefinition = "BYTEA")
+    private byte[] txId; // ULID 16 bytes
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "earning_id", nullable = false)

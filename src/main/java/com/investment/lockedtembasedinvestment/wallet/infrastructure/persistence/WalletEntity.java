@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user_wallets")
@@ -18,9 +19,8 @@ import java.math.BigDecimal;
 public class WalletEntity extends AuditableEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "wallet_id")
-    private Long walletId;
+    @Column(name = "wallet_id", updatable = false, nullable = false)
+    private UUID walletId;
 
     @Column(name = "total_balance", nullable = false, precision = 18, scale = 8)
     private BigDecimal totalBalance;

@@ -1,9 +1,10 @@
 package com.investment.lockedtembasedinvestment.wallet.api.dto.response;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record UserWalletResponse(
-   Long walletId,
+   UUID walletId,
    BigDecimal totalBalance,
    BigDecimal balanceAvailable,
    BigDecimal balanceFrozen,
