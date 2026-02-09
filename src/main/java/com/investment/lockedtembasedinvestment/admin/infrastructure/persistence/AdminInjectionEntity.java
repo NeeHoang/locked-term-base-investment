@@ -14,7 +14,7 @@ import java.time.Instant;
 public class AdminInjectionEntity {
 
     @Id
-    @Column(name = "tx_id", columnDefinition = "BYTEA", nullable = false)
+    @Column(name = "tx_id", columnDefinition = "BYTEA", nullable = false, updatable = false)
     private byte[] txId; // ULID (16 bytes)
 
     @Column(name = "amount", precision = 18, scale = 8, nullable = false)
