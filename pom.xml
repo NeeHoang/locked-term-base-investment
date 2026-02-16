@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.investment</groupId>
-    <artifactId>locked-tem-based-investment</artifactId>
+    <artifactId>locked-term-based-investment</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>locked-tem-based-investment</name>
-    <description>locked-tem-based-investment</description>
+    <name>locked-term-based-investment</name>
+    <description>locked-term-based-investment</description>
     <url/>
     <licenses>
         <license/>

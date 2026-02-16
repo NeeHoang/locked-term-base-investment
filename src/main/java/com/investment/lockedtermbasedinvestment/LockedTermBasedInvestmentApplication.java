@@ -1,0 +1,13 @@
+package com.investment.lockedtermbasedinvestment;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class LockedTermBasedInvestmentApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LockedTermBasedInvestmentApplication.class, args);
+    }
+
+}
