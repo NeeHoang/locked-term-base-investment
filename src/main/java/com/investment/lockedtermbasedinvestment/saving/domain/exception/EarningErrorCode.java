@@ -12,8 +12,10 @@ public enum EarningErrorCode implements DomainErrorCode {
     INVALID_HOLDING_DAYS("EARNING_005", HttpStatus.BAD_REQUEST),
     INVALID_TOTAL_INTEREST("EARNING_006", HttpStatus.BAD_REQUEST),
     INVALID_AVAILABLE_AMOUNT("EARNING_007", HttpStatus.BAD_REQUEST),
-    EARLY_WITHRAW_NOT_ALLOWED("EARNING_008", HttpStatus.CONFLICT);
+    EARLY_WITHDRAW_NOT_ALLOWED("EARNING_008", HttpStatus.CONFLICT),
+    INVALID_PENALTY_RATE("EARNING_009", HttpStatus.BAD_REQUEST)
 
+    ;
     private final String code;
     private final HttpStatus httpStatus;
 

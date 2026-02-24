@@ -12,7 +12,7 @@ public record HoldingDays(int value) {
         }
     }
 
-    public HoldingDays increment(int value) {
-        return new HoldingDays(value + 1);
+    public HoldingDays increment() {
+        return new HoldingDays(this.value + 1);
     }
 }

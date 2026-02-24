@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public record AdminInjectionRequest(
         BigDecimal amount,
-        byte[] adminId,
+        //01HXQZK7M9F0A8K3R5YJ2D6V4B
         String note
 ) {
 }

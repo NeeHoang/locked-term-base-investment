@@ -1,10 +1,7 @@
 package com.investment.lockedtermbasedinvestment.admin.infrastructure.persistence;
 
 import com.investment.lockedtermbasedinvestment.common.enums.LiquidityPoolStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,4 +31,9 @@ public class LiquidityPoolEntity {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
 }

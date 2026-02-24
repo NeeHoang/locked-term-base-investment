@@ -9,7 +9,11 @@ import java.util.Optional;
 public interface LockedProductRepository {
 
     Optional<LockedProductAggregate> findById(LockedProductId id);
+
     void save(LockedProductAggregate lockedProduct);
+
+    void update(LockedProductAggregate lockedProduct);
+
     List<LockedProductAggregate> findAll();
 
     List<LockedProductAggregate> findAllActive();

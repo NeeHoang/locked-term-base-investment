@@ -3,9 +3,10 @@ package com.investment.lockedtermbasedinvestment.saving.domain.aggregate;
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.EarningErrorCode;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.EarningException;
-import com.investment.lockedtermbasedinvestment.saving.domain.policy.PenaltyPolicy;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.*;
 import lombok.Getter;
+
+import java.math.BigDecimal;
 
 @Getter
 public class EarningAggregate {
@@ -43,7 +44,7 @@ public class EarningAggregate {
         this.totalInterest = Money.zero();
         this.available = Money.zero();
 
-        this.penaltyRate = PenaltyRate.zero();
+        this.penaltyRate = PenaltyRate.of(BigDecimal.ZERO);
         this.penaltyAmount = Money.zero();
 
         validateInvariants();
@@ -67,14 +68,19 @@ public class EarningAggregate {
         this.available = available;
         this.penaltyRate = penaltyRate;
         this.penaltyAmount = penaltyAmount;
+
+        validateInvariants();
     }
 
     //Daily job
     public void accrueOneDay() {
         if (holdingDays.value() >= termDays.value()) return;
 
-        this.holdingDays = holdingDays.increment(holdingDays.value());
-        this.progress = Progress.of(holdingDays.value(), termDays.value());
+        this.holdingDays = holdingDays.increment();
+        this.progress = Progress.of(
+                this.holdingDays.value(),
+                termDays.value()
+        );
 
         this.totalInterest = totalInterest.add(interestPerDay);
         this.available = available.add(interestPerDay);
@@ -84,12 +90,14 @@ public class EarningAggregate {
 
     //User withdraw
     public Money withdraw(Money amount) {
+
         if (amount.isNegative() || amount.isZero()) {
             throw new EarningException(
                     EarningErrorCode.INVALID_AVAILABLE_AMOUNT,
                     "Withdraw amount must be positive"
             );
         }
+
         if (available.isLessThan(amount)) {
             throw new EarningException(
                     EarningErrorCode.INVALID_AVAILABLE_AMOUNT,
@@ -103,7 +111,7 @@ public class EarningAggregate {
         return amount;
     }
 
-    public void earlyRedeem(PenaltyPolicy policy) {
+    void earlyRedeem(PenaltyRate penaltyRate) {
 
         if (holdingDays.value() >= termDays.value()) {
             throw new EarningException(
@@ -112,22 +120,36 @@ public class EarningAggregate {
             );
         }
 
+        if (penaltyRate == null || !penaltyRate.isAllowed()) {
+            throw new EarningException(
+                    EarningErrorCode.INVALID_PENALTY_RATE,
+                    "Penalty rate is not allowed"
+            );
+        }
+
+        applyPenalty(penaltyRate);
+    }
+
+    void applyPenalty(PenaltyRate penaltyRate) {
+
+        this.penaltyRate = penaltyRate;
         this.penaltyAmount = totalInterest.multiply(penaltyRate.value());
 
         if (available.isGreaterThanOrEqual(penaltyAmount)) {
-            this.available = available.subtract(penaltyAmount);
-            this.available = available.add(principal);
+            this.available = available
+                    .subtract(penaltyAmount)
+                    .add(principal);
         }
         else {
-            // available khong du -> tru vao principal
             Money remainingPenalty = penaltyAmount.subtract(available);
-            this.available = available.add(principal.subtract(remainingPenalty));
+            this.available = principal.subtract(remainingPenalty);
         }
 
         validateInvariants();
     }
 
     public void mature() {
+
         if (holdingDays.value() < termDays.value()) {
             throw new EarningException(
                     EarningErrorCode.INVALID_HOLDING_DAYS,
@@ -135,8 +157,11 @@ public class EarningAggregate {
             );
         }
 
-        this.available = available.add(principal);
+        if (available.isGreaterThanOrEqual(principal)) {
+            return; // idempotent
+        }
 
+        this.available = available.add(principal);
         validateInvariants();
     }
 

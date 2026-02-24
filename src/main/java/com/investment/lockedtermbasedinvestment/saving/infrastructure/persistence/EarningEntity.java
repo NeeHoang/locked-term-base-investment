@@ -49,4 +49,9 @@ public class EarningEntity extends AuditableEntity {
 
     @Column(name = "term_days", nullable = false)
     private int termDays;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
 }

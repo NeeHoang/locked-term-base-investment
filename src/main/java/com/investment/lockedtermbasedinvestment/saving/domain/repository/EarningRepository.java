@@ -10,8 +10,13 @@ import java.util.Optional;
 
 public interface EarningRepository {
 
+    EarningAggregate save(EarningAggregate earningAggregate);
+
     Optional<EarningAggregate> findById(EarningId id);
+
     Optional<EarningAggregate> findBySubscriptionId(SubscriptionId subscriptionId);
-    void save(EarningAggregate earning);
+
+    void update(EarningAggregate earning);
+
     List<EarningAggregate> findAllActiveForAccrual(LocalDate today);
 }

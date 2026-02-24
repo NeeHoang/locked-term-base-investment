@@ -1,5 +1,6 @@
 package com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.impl;
 
+import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.repository.SubscriptionRepository;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.SubscriptionId;
@@ -48,7 +49,22 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
     @Override
     public List<SubscriptionAggregate> findProductSubscribeToday() {
-        return jpaRepository.findByStartDate(LocalDate.now())
+
+        LocalDate startDate = LocalDate.now().plusDays(1);
+
+        return jpaRepository.findByStartDate(startDate)
+                .stream()
+                .map(SubscriptionMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<SubscriptionAggregate> findSubscribeByWalletId(UUID walletId, LocalDate today) {
+
+        LocalDate startDate = today.plusDays(1);
+
+        return jpaRepository
+                .findByWalletIdAndStartDate(walletId, startDate)
                 .stream()
                 .map(SubscriptionMapper::toDomain)
                 .toList();
@@ -57,6 +73,14 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     @Override
     public List<SubscriptionAggregate> findHistorySubscribe(UUID walletId) {
         return jpaRepository.findByWalletId(walletId)
+                .stream()
+                .map(SubscriptionMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<SubscriptionAggregate> findByStatus(SubscriptionStatus status) {
+        return jpaRepository.findByStatus(status)
                 .stream()
                 .map(SubscriptionMapper::toDomain)
                 .toList();

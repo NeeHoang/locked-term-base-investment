@@ -2,6 +2,8 @@ package com.investment.lockedtermbasedinvestment.saving.infrastructure.repositor
 
 import com.investment.lockedtermbasedinvestment.common.enums.LockedProductStatus;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.LockedProductAggregate;
+import com.investment.lockedtermbasedinvestment.saving.domain.exception.LockedProductErrorCode;
+import com.investment.lockedtermbasedinvestment.saving.domain.exception.LockedProductException;
 import com.investment.lockedtermbasedinvestment.saving.domain.repository.LockedProductRepository;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.LockedProductId;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.LockedProductEntity;
@@ -37,6 +39,16 @@ public class LockedProductRepositoryImpl implements LockedProductRepository {
                     new LockedProductId(saved.getProductId())
             );
         }
+    }
+
+    @Override
+    public void update(LockedProductAggregate lockedProduct) {
+
+        LockedProductEntity entity =
+                jpaRepository.getReferenceById(lockedProduct.getId().value());
+
+        entity.setAvailableQuota(lockedProduct.getAvailableQuota().amount());
+        entity.setStatus(lockedProduct.getStatus());
     }
 
     @Override

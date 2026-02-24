@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,9 @@ public class LockedProductServiceImpl implements LockedProductService {
     @Transactional
     public LockedProductAggregate create(LockedProductRequest request) {
 
-        if (request.termDays() == null) throw new IllegalArgumentException("termDays is required");
+        if (request.termDays() == null) throw new LockedProductException(
+                LockedProductErrorCode.TERM_DAYS_IS_REQUIRED,
+                "termDays is required");
 
         TermDays termDays = new TermDays(request.termDays());
         InterestRate interestRate = new InterestRate(request.interestRate());

@@ -4,6 +4,7 @@ import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.SubscriptionErrorCode;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.SubscriptionException;
+import com.investment.lockedtermbasedinvestment.saving.domain.policy.PenaltyPolicy;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.*;
 import lombok.Getter;
 
@@ -44,7 +45,7 @@ public class SubscriptionAggregate {
         this.termDays = termDays;
         this.startDate = startDate;
 
-        this.maturityDate = startDate.plusDays(termDays.value());
+        this.maturityDate = startDate.plusDays(termDays.value() - 1);
         this.totalInterest = interestRate.calculateTotal(principal, termDays);
         this.status = SubscriptionStatus.ACTIVE;
 
@@ -95,7 +96,7 @@ public class SubscriptionAggregate {
             );
         }
 
-        if (maturityDate == null || !maturityDate.isAfter(startDate)) {
+        if (!maturityDate.isEqual(startDate) && !maturityDate.isAfter(startDate)) {
             throw new SubscriptionException(
                     SubscriptionErrorCode.INVALID_MATURITY_DATE,
                     "Maturity date must be after start date"
@@ -110,24 +111,57 @@ public class SubscriptionAggregate {
         }
     }
 
-    public void markMatured() {
+    public void accrueDaily(EarningAggregate earning, LocalDate today) {
+
         if (status != SubscriptionStatus.ACTIVE) {
-            throw new SubscriptionException(
-                    SubscriptionErrorCode.INVALID_STATUS_TRANSITION,
-                    "Only active subscription can be matured"
-            );
+            return;
         }
+
+        if (today.isBefore(startDate)) {
+            return;
+        }
+
+        if (today.isAfter(maturityDate)) {
+            this.status = SubscriptionStatus.MATURED;
+            earning.mature();
+            return;
+        }
+
+        earning.accrueOneDay();
+    }
+
+    public boolean isEligibleForDailyAccrual(LocalDate today) {
+        return status == SubscriptionStatus.ACTIVE
+                && !today.isBefore(startDate);
+    }
+
+    public void mature(EarningAggregate earning) {
+
+        if (status != SubscriptionStatus.ACTIVE) {
+            return;
+        }
+        earning.mature();
         this.status = SubscriptionStatus.MATURED;
     }
 
-    public void markEarlyRedeemed() {
+    public void earlyRedeem(EarningAggregate earning, PenaltyPolicy policy) {
+
+        ensureActive();
+
+        PenaltyRate penaltyRate = policy.penaltyRate(earning.getProgress());
+
+        earning.earlyRedeem(penaltyRate);
+
+        this.status = SubscriptionStatus.EARLY_REDEEMED;
+    }
+
+    private void ensureActive() {
         if (status != SubscriptionStatus.ACTIVE) {
             throw new SubscriptionException(
                     SubscriptionErrorCode.INVALID_STATUS_TRANSITION,
-                    "Only active subscription can be early redeemed"
+                    "Subscription is not ACTIVE"
             );
         }
-        this.status = SubscriptionStatus.EARLY_REDEEMED;
     }
 }
 

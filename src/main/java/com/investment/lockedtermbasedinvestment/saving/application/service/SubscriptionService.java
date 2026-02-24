@@ -13,7 +13,9 @@ public interface SubscriptionService {
 
     List<SubscriptionAggregate> getByWallet(String walletId);
 
-    List<SubscriptionAggregate> getSubscribeToday();
+    List<SubscriptionAggregate> getAllSubscribeToday();
+
+    List<SubscriptionAggregate> getSubscribeTodayById(String walletId);
 
     List<SubscriptionAggregate> getByWalletId(String walletId);
 }

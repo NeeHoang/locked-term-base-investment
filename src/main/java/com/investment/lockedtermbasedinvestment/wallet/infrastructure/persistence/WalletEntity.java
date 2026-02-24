@@ -34,5 +34,10 @@ public class WalletEntity extends AuditableEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private WalletStatus status; // ACTIVE, INACTIVE, SUSPENDED
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
 }
 

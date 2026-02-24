@@ -15,7 +15,8 @@ public enum SubscriptionErrorCode implements DomainErrorCode {
     INVALID_TOTAL_INTEREST("SUB_008", HttpStatus.BAD_REQUEST),
     INVALID_SUBSCRIPTION_STATE("SUB_009", HttpStatus.CONFLICT),
     INVALID_STATUS_TRANSITION("SUB_010", HttpStatus.CONFLICT),
-    INVALID_WALLET_ID("SUB_011", HttpStatus.BAD_REQUEST)
+    INVALID_WALLET_ID("SUB_011", HttpStatus.BAD_REQUEST),
+    EARLY_REDEEM_NOT_ALLOWED("SUB_012", HttpStatus.BAD_REQUEST)
     ;
 
     private final String code;

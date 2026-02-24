@@ -1,6 +1,8 @@
 package com.investment.lockedtermbasedinvestment.wallet.infrastructure.repository.impl;
 
 import com.investment.lockedtermbasedinvestment.wallet.domain.aggregate.WalletAggregate;
+import com.investment.lockedtermbasedinvestment.wallet.domain.exception.WalletErrorCode;
+import com.investment.lockedtermbasedinvestment.wallet.domain.exception.WalletException;
 import com.investment.lockedtermbasedinvestment.wallet.domain.repository.WalletRepository;
 import com.investment.lockedtermbasedinvestment.wallet.domain.valueobject.WalletId;
 import com.investment.lockedtermbasedinvestment.wallet.infrastructure.persistence.WalletEntity;
@@ -34,6 +36,17 @@ public class WalletRepositoryImpl implements WalletRepository {
 
     @Override
     public void delete(WalletAggregate wallet) {
-        jpaRepository.delete(WalletMapper.toEntity(wallet));
+        jpaRepository.deleteById(wallet.getId().value());
+    }
+
+    @Override
+    public void update(WalletAggregate wallet) {
+
+        WalletEntity entity = jpaRepository.getReferenceById(wallet.getId().value());
+
+        entity.setTotalBalance(wallet.getTotalBalance().toBigDecimal());
+        entity.setBalanceAvailable(wallet.getBalanceAvailable().toBigDecimal());
+        entity.setBalanceFrozen(wallet.getBalanceFrozen().toBigDecimal());
+        entity.setStatus(wallet.getStatus());
     }
 }

@@ -1,6 +1,8 @@
 package com.investment.lockedtermbasedinvestment.admin.infrastructure.persistence;
 
+import com.github.f4b6a3.ulid.UlidCreator;
 import com.investment.lockedtermbasedinvestment.common.enums.LiquidityTransactionType;
+import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,5 +42,26 @@ public class LiquidityLedgerEntity {
     @PrePersist
     void prePersist() {
         this.createdAt = Instant.now();
+    }
+
+    public static LiquidityLedgerEntity dailyInterestDebit(
+            Money liquidityBefore,
+            Money debitAmount,
+            Money liquidityAfter,
+            byte[] referenceId
+    ) {
+
+        LiquidityLedgerEntity ledger = new LiquidityLedgerEntity();
+
+        ledger.setTxId(UlidCreator.getUlid().toBytes()); // ULID 16 bytes
+        ledger.setTxType(LiquidityTransactionType.DAILY_INTEREST);
+
+        ledger.setLiquidityBefore(liquidityBefore.toBigDecimal());
+        ledger.setAmount(debitAmount.toBigDecimal());
+        ledger.setLiquidityAfter(liquidityAfter.toBigDecimal());
+
+        ledger.setReferenceId(referenceId);
+
+        return ledger;
     }
 }

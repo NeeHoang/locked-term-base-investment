@@ -24,29 +24,62 @@ public class EarningRepositoryImpl implements EarningRepository {
     private final JpaSubscriptionRepository jpaSubscriptionRepository;
 
     @Override
+    public EarningAggregate save(EarningAggregate earning) {
+
+        SubscriptionEntity subscriptionEntity =
+                jpaSubscriptionRepository.findById(
+                        earning.getSubscriptionId().value()
+                ).orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Subscription not found: " + earning.getSubscriptionId()
+                        )
+                );
+
+        EarningEntity entity = EarningMapper.toEntity(
+                earning,
+                subscriptionEntity
+        );
+
+        EarningEntity saved = jpaEarningRepository.save(entity);
+
+        return EarningMapper.toDomain(saved);
+    }
+
+    @Override
     public Optional<EarningAggregate> findById(EarningId id) {
-        return jpaEarningRepository.findById(id.value())
+        return jpaEarningRepository
+                .findById(id.value())
                 .map(EarningMapper::toDomain);
     }
 
     @Override
     public Optional<EarningAggregate> findBySubscriptionId(SubscriptionId subscriptionId) {
-        return Optional.empty();
+        return jpaEarningRepository
+                .findBySubscription_SubscriptionId(subscriptionId.value())
+                .map(EarningMapper::toDomain);
     }
 
     @Override
-    public void save(EarningAggregate earning) {
+    public void update(EarningAggregate earning) {
 
-        SubscriptionEntity subscriptionEntity = jpaSubscriptionRepository.findById(
-                earning.getSubscriptionId().value()
+        EarningEntity entity = jpaEarningRepository.findById(
+                earning.getId().value()
         ).orElseThrow(() ->
-                new IllegalArgumentException(
-                        "Subscription not found: " + earning.getSubscriptionId()
+                new IllegalStateException(
+                        "Earning not found: " + earning.getId()
                 )
         );
 
-        EarningEntity entity = EarningMapper.toEntity(earning, subscriptionEntity);
-        jpaEarningRepository.save(entity);
+        // Hibernate dirty checking auto update & increment version
+        entity.setPrincipal(earning.getPrincipal().amount());
+        entity.setTotalInterest(earning.getTotalInterest().amount());
+        entity.setAvailable(earning.getAvailable().amount());
+        entity.setHoldingDays(earning.getHoldingDays().value());
+        entity.setInterestPerDay(earning.getInterestPerDay().amount());
+        entity.setPenaltyAmount(earning.getPenaltyAmount().amount());
+        entity.setPenaltyRate(earning.getPenaltyRate().value());
+        entity.setTermDays(earning.getTermDays().value());
+        entity.setProgress(earning.getProgress().value());
     }
 
     @Override

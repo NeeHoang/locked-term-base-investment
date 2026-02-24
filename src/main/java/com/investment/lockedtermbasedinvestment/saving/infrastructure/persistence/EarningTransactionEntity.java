@@ -1,7 +1,9 @@
 package com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence;
 
+import com.github.f4b6a3.ulid.UlidCreator;
 import com.investment.lockedtermbasedinvestment.common.enums.EarningTransaction;
 import com.investment.lockedtermbasedinvestment.common.enums.EarningTxType;
+import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,9 +23,8 @@ public class EarningTransactionEntity {
     @Column(name = "tx_id", nullable = false, updatable = false, columnDefinition = "BYTEA")
     private byte[] txId; // ULID 16 bytes
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "earning_id", nullable = false)
-    private EarningEntity earning;
+    private Long earningId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tx_type", nullable = false)
@@ -48,5 +49,22 @@ public class EarningTransactionEntity {
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
+    }
+
+    public static EarningTransactionEntity dailyAccrual(
+            Long earningId,
+            Money before,
+            Money delta,
+            Money after
+    ) {
+        EarningTransactionEntity tx = new EarningTransactionEntity();
+        tx.setTxId(UlidCreator.getUlid().toBytes());
+        tx.setEarningId(earningId);
+        tx.setTxType(EarningTxType.DAILY_INTEREST);
+        tx.setStatus(EarningTransaction.SUCCESS);
+        tx.setAvailableBefore(before.toBigDecimal());
+        tx.setAmount(delta.toBigDecimal());
+        tx.setAvailableAfter(after.toBigDecimal());
+        return tx;
     }
 }

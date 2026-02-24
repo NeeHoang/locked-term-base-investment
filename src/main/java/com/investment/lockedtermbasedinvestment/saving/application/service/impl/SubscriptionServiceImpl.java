@@ -61,6 +61,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         wallet.lockSaving(principal);
         lockProduct.subscribe(principal);
 
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
         // 3. Create subscription
         SubscriptionAggregate subscriptionAggregate = SubscriptionFactory.createNew(
                 WalletRef.from(walletId),
@@ -77,8 +83,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         );
 
         // 5. persist
-        walletRepository.save(wallet);
-        lockedProductRepository.save(lockProduct);
+        walletRepository.update(wallet);
+        lockedProductRepository.update(lockProduct);
         subscriptionRepository.save(subscriptionAggregate);
         earningRepository.save(earningAggregate);
 
@@ -96,8 +102,27 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<SubscriptionAggregate> getSubscribeToday() {
+    public List<SubscriptionAggregate> getAllSubscribeToday() {
         return subscriptionRepository.findProductSubscribeToday();
+    }
+
+    @Override
+    public List<SubscriptionAggregate> getSubscribeTodayById(String walletId) {
+
+        WalletId id = WalletId.from(walletId);
+
+        walletRepository.findById(id)
+                .orElseThrow(() -> new WalletException(
+                        WalletErrorCode.INVALID_WALLET_ID,
+                        "Wallet not found with id: " + walletId
+                ));
+
+        LocalDate today = LocalDate.now();
+
+        return subscriptionRepository.findSubscribeByWalletId(
+                id.value(),
+                today
+        );
     }
 
     @Override

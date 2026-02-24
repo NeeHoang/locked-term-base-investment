@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -21,9 +22,19 @@ public class LiquidityPoolRepositoryImpl implements LiquidityPoolRepository {
 
     @Override
     public void save(LiquidityPoolAggregate aggregate) {
-        LiquidityPoolEntity entity = mapper.toEntity(aggregate);
-        jpaLiquidityPoolRepository.save(entity);
-        log.info("Create Liquidity Pool successfully with Id: {}", aggregate.getId().value());
+        LiquidityPoolEntity entity = jpaLiquidityPoolRepository.findSoloRecord();
+
+        if (entity == null) {
+            throw new IllegalStateException("Liquidity pool not initialized");
+        }
+
+        entity.setTotalAmount(aggregate.getTotalAmount().amount());
+        entity.setMinThreshold(aggregate.getMinThreshold().amount());
+        entity.setStatus(aggregate.getStatus());
+        entity.setUpdatedAt(Instant.now());
+
+        // Hibernate dirty checking
+        log.info("Updated Liquidity Pool {}", aggregate.getId().value());
     }
 
     @Override

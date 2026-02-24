@@ -14,8 +14,10 @@ public class SubscriptionFactory {
             Money principal,
             InterestRate interestRate,
             TermDays termDays,
-            LocalDate startDate
+            LocalDate createdDate
     ) {
+        LocalDate interestStartDate = createdDate.plusDays(1);
+
         return new SubscriptionAggregate(
                 SubscriptionId.generate(),
                 walletRef,
@@ -23,7 +25,7 @@ public class SubscriptionFactory {
                 principal,
                 interestRate,
                 termDays,
-                startDate
+                interestStartDate
         );
     }
 }

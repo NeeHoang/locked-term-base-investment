@@ -41,4 +41,9 @@ public class LockedProductEntity extends AuditableEntity {
 
     @Column(name = "total_quota", precision = 18, scale = 8)
     private BigDecimal totalQuota;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
 }

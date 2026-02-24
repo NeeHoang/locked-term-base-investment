@@ -9,6 +9,10 @@ public record SubscriptionId(UUID value) {
             throw new IllegalArgumentException("SubscriptionId must be not null");
     }
 
+    public UUID value() {
+        return value;
+    }
+
     public static SubscriptionId generate() {
         return new SubscriptionId(UUID.randomUUID());
     }

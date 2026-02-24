@@ -6,6 +6,8 @@ import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.*;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.SubscriptionEntity;
 
+import java.math.BigDecimal;
+
 public class EarningMapper {
 
     public static EarningAggregate toDomain(EarningEntity entity) {
@@ -19,7 +21,10 @@ public class EarningMapper {
                 new Progress(entity.getProgress()),
                 Money.of(entity.getTotalInterest()),
                 Money.of(entity.getAvailable()),
-                new PenaltyRate(entity.getPenaltyRate()),
+                entity.getPenaltyRate() == null
+                        || entity.getPenaltyRate().compareTo(BigDecimal.ZERO) == 0
+                        ? PenaltyRate.notAllowed()
+                        : PenaltyRate.of(entity.getPenaltyRate()),
                 Money.of(entity.getPenaltyAmount())
         );
     }
@@ -38,6 +43,7 @@ public class EarningMapper {
         entity.setHoldingDays(aggregate.getHoldingDays().value());
         entity.setInterestPerDay(aggregate.getInterestPerDay().amount());
         entity.setPenaltyAmount(aggregate.getPenaltyAmount().amount());
+        entity.setTermDays(aggregate.getTermDays().value());
         entity.setPenaltyRate(aggregate.getPenaltyRate().value());
         entity.setProgress(aggregate.getProgress().value());
 

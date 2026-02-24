@@ -12,4 +12,6 @@ public interface WalletRepository {
     void save(WalletAggregate wallet);
 
     void delete(WalletAggregate wallet);
+
+    void update(WalletAggregate wallet);
 }
