@@ -67,7 +67,10 @@ public class CMSSubscriptionController {
 
         BatchProcessResponse response = accrualJob.accrueDailyInterest(runDate);
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(response));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Daily interest manual cron job successfully",
+                response
+        ));
     }
 
     @Operation(
@@ -87,7 +90,10 @@ public class CMSSubscriptionController {
                 .map(this::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(responses));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get all register subscription today successfully",
+                responses
+        ));
     }
 
     private SubscriptionResponse toResponse(SubscriptionAggregate aggregate) {

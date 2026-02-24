@@ -25,7 +25,15 @@ public class LiquidityPoolRepositoryImpl implements LiquidityPoolRepository {
         LiquidityPoolEntity entity = jpaLiquidityPoolRepository.findSoloRecord();
 
         if (entity == null) {
-            throw new IllegalStateException("Liquidity pool not initialized");
+            entity = new LiquidityPoolEntity();
+            entity.setId(aggregate.getId().value());
+            entity.setTotalAmount(aggregate.getTotalAmount().amount());
+            entity.setMinThreshold(aggregate.getMinThreshold().amount());
+            entity.setStatus(aggregate.getStatus());
+            entity.setLastInjectedAt(Instant.now());
+            entity.setUpdatedAt(Instant.now());
+
+            jpaLiquidityPoolRepository.save(entity);
         }
 
         entity.setTotalAmount(aggregate.getTotalAmount().amount());

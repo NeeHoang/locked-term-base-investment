@@ -46,7 +46,10 @@ public class LockedProductController {
                 .map(this::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(responses));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get all active locked product successfully",
+                responses
+        ));
     }
 
     // U-02 -- AC-04
@@ -69,7 +72,10 @@ public class LockedProductController {
                 .map(this::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(responses));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get all operation locked product successfully",
+                responses
+        ));
     }
 
     private LockedProductResponse toResponse(LockedProductAggregate aggregate) {

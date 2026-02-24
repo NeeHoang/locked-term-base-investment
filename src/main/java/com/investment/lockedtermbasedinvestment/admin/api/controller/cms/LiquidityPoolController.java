@@ -68,7 +68,11 @@ public class LiquidityPoolController {
 
         List<LiquidityPoolAggregate> aggregates = liquidityPoolService.getAll();
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(toResponses(aggregates)));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get all liquidity pool successfully",
+                toResponses(aggregates)
+                )
+        );
     }
 
     @Operation(
@@ -106,7 +110,11 @@ public class LiquidityPoolController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponseDTO.created(null));
+                .body(ApiResponseDTO.created(
+                        "Created liquidity pool successfully",
+                        null
+                        )
+                );
     }
 
     @Operation(
@@ -131,7 +139,11 @@ public class LiquidityPoolController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponseDTO.created(response));
+                .body(ApiResponseDTO.created(
+                        "Injection liquidity pool successfully",
+                        response
+                )
+                );
     }
 
     private static LiquidityPoolResponse toResponse(LiquidityPoolAggregate aggregate) {

@@ -48,7 +48,10 @@ public class UserWalletController {
     ) {
         WalletAggregate aggregate = service.getById(walletId);
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(toResponse(aggregate)));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get wallet info successfully",
+                toResponse(aggregate)
+        ));
     }
 
     @Operation(
@@ -68,7 +71,9 @@ public class UserWalletController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponseDTO.created(toResponse(aggregate)));
+                .body(ApiResponseDTO.created(
+                        "Created user wallet successfully",
+                        toResponse(aggregate)));
     }
 
     private UserWalletResponse toResponse(WalletAggregate aggregate) {

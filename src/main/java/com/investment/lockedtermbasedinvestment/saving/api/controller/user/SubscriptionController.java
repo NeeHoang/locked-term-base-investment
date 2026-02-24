@@ -62,7 +62,9 @@ public class SubscriptionController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponseDTO.created(toResponse(aggregate)));
+                .body(ApiResponseDTO.created(
+                        "Created subscription successfully",
+                        toResponse(aggregate)));
     }
 
     // U-02 -- AC-03
@@ -90,7 +92,9 @@ public class SubscriptionController {
                 .map(this::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(responses));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get subscription registered to day successfully",
+                responses));
     }
 
     // U-02 -- AC-05
@@ -118,7 +122,9 @@ public class SubscriptionController {
                 .map(this::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(responses));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get all history subscription successfully",
+                responses));
     }
 
     private SubscriptionResponse toResponse(SubscriptionAggregate aggregate) {

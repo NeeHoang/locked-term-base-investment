@@ -45,7 +45,10 @@ public class CMSLockedProductController {
         LockedProductAggregate aggregate = service.findById(id);
 
         return ResponseEntity.ok(
-                ApiResponseDTO.ok(toResponse(aggregate))
+                ApiResponseDTO.ok(
+                        "Get locked product successfully",
+                        toResponse(aggregate)
+                )
         );
     }
 
@@ -65,7 +68,11 @@ public class CMSLockedProductController {
                 .map(this::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(ApiResponseDTO.ok(responses));
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get all product successfully",
+                responses
+                )
+        );
     }
 
     @Operation(
@@ -88,7 +95,11 @@ public class CMSLockedProductController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponseDTO.created(toResponse(aggregate)));
+                .body(ApiResponseDTO.created(
+                        "Created locked product successfully",
+                        toResponse(aggregate)
+                )
+                );
     }
 
     private LockedProductResponse toResponse(LockedProductAggregate aggregate) {

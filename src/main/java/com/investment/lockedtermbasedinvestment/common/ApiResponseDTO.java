@@ -6,11 +6,11 @@ public record ApiResponseDTO<T>(
         T data
 ) {
 
-    public static <T> ApiResponseDTO<T> ok(T data) {
-        return new ApiResponseDTO<>("SUCCESS", "success", data);
+    public static <T> ApiResponseDTO<T> ok(String message, T data) {
+        return new ApiResponseDTO<>("SUCCESS", message, data);
     }
 
-    public static <T> ApiResponseDTO<T> created(T data) {
-        return new ApiResponseDTO<>("CREATED", "Created successfully", data);
+    public static <T> ApiResponseDTO<T> created(String message, T data) {
+        return new ApiResponseDTO<>("CREATED", message, data);
     }
 }
