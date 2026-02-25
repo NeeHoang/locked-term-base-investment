@@ -19,5 +19,20 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    image: locked-saving-backend
+    container_name: locked_saving_backend
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/locked_saving_db
+      SPRING_DATASOURCE_USERNAME: saving
+      SPRING_DATASOURCE_PASSWORD: 123
+
+
 volumes:
   locked_saving_postgres_data:

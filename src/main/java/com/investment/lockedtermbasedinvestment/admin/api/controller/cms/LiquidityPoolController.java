@@ -134,8 +134,6 @@ public class LiquidityPoolController {
     })
     @PostMapping("/inject")
     public ResponseEntity<ApiResponseDTO<AdminInjectionResponse>> inject(
-            // hard code 01HXQZK7M9F0A8K3R5YJ2D6V4B
-            @RequestHeader("X-ADMIN-ID") String adminId,
 
             @Valid @RequestBody InjectionRequest request
             ) {
