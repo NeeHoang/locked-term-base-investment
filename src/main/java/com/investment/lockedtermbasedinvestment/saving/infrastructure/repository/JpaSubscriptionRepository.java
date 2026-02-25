@@ -56,7 +56,8 @@ select new com.investment.lockedtermbasedinvestment.saving.api.dto.response.Acti
     p.interestRate,
     e.totalInterest,
     e.holdingDays,
-    e.progress
+    e.progress,
+    e.available
 )
 from SubscriptionEntity s
 join s.product p

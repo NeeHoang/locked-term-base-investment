@@ -14,7 +14,8 @@ public record ActivePackageResponse(
         BigDecimal interestRte,
         BigDecimal accruedInterest,
         int holdingDays,
-        BigDecimal progress
+        BigDecimal progress,
+        BigDecimal available
 
 ) {
 }
