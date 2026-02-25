@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface SubscriptionRepository {
 
     Optional<SubscriptionAggregate> findById(SubscriptionId id);
+
     void save(SubscriptionAggregate aggregate);
 
     List<SubscriptionAggregate> findProductSubscribeToday();
@@ -19,6 +20,8 @@ public interface SubscriptionRepository {
     List<SubscriptionAggregate> findSubscribeByWalletId(UUID walletId, LocalDate today);
 
     List<SubscriptionAggregate> findHistorySubscribe(UUID walletId);
+
+    List<SubscriptionAggregate> findActiveSubscribe(UUID walletId);
 
     List<SubscriptionAggregate> findByStatus(SubscriptionStatus status);
 }

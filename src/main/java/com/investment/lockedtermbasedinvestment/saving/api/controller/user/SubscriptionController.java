@@ -117,14 +117,37 @@ public class SubscriptionController {
     ) {
 
         List<SubscriptionResponse> responses = subscriptionService
-                .getByWalletId(walletId)
+                .getHistoryByWalletId(walletId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
 
         return ResponseEntity.ok(ApiResponseDTO.ok(
                 "Get all history subscription successfully",
-                responses));
+                responses
+        ));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponseDTO<List<SubscriptionResponse>>> getActiveSubscribe(
+            @Parameter(
+                    description = "User wallet identifier",
+                    required = true,
+                    example = "3ff732cb-cf34-41fe-b587-3d2e8cb93c68"
+            )
+            @RequestHeader("X-WALLET-ID") String walletId
+    ) {
+
+        List<SubscriptionResponse> responses = subscriptionService
+                .getActiveByWalletId(walletId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get all active subscription successfully",
+                responses
+        ));
     }
 
     private SubscriptionResponse toResponse(SubscriptionAggregate aggregate) {

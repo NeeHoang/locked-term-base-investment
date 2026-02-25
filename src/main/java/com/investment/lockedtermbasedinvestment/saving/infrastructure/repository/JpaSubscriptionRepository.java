@@ -32,4 +32,15 @@ public interface JpaSubscriptionRepository extends JpaRepository<SubscriptionEnt
             @Param("walletId") UUID walletId,
             @Param("startDate") LocalDate startDate
     );
+
+    @Query("""
+    select s
+    from SubscriptionEntity s
+    where s.walletId = :walletId
+    and s.status = :status
+""")
+    List<SubscriptionEntity> findByWalletIdAndActive(
+            @Param("walletId") UUID walletId,
+            @Param("status") SubscriptionStatus status
+    );
 }

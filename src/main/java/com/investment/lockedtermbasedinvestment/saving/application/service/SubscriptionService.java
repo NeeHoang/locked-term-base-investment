@@ -9,13 +9,11 @@ public interface SubscriptionService {
 
     SubscriptionAggregate create(String walletId, CreateSubscriptionRequest request);
 
-    SubscriptionAggregate getById(Long subscriptionId);
-
-    List<SubscriptionAggregate> getByWallet(String walletId);
-
     List<SubscriptionAggregate> getAllSubscribeToday();
 
     List<SubscriptionAggregate> getSubscribeTodayById(String walletId);
 
-    List<SubscriptionAggregate> getByWalletId(String walletId);
+    List<SubscriptionAggregate> getHistoryByWalletId(String walletId);
+
+    List<SubscriptionAggregate> getActiveByWalletId(String walletId);
 }

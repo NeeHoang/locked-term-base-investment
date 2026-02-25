@@ -92,16 +92,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public SubscriptionAggregate getById(Long subscriptionId) {
-        return null;
-    }
-
-    @Override
-    public List<SubscriptionAggregate> getByWallet(String walletId) {
-        return List.of();
-    }
-
-    @Override
     public List<SubscriptionAggregate> getAllSubscribeToday() {
         return subscriptionRepository.findProductSubscribeToday();
     }
@@ -126,8 +116,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<SubscriptionAggregate> getByWalletId(String id) {
+    public List<SubscriptionAggregate> getHistoryByWalletId(String id) {
         WalletId walletId = WalletId.from(id);
         return subscriptionRepository.findHistorySubscribe(walletId.value());
+    }
+
+    @Override
+    public List<SubscriptionAggregate> getActiveByWalletId(String id) {
+        WalletId walletId = WalletId.from(id);
+        return subscriptionRepository.findActiveSubscribe(walletId.value());
     }
 }

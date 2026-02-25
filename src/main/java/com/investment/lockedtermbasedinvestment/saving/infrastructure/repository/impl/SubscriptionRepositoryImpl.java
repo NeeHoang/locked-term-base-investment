@@ -79,6 +79,14 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     }
 
     @Override
+    public List<SubscriptionAggregate> findActiveSubscribe(UUID walletId) {
+        return jpaRepository.findByWalletIdAndActive(walletId, SubscriptionStatus.ACTIVE)
+                .stream()
+                .map(SubscriptionMapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public List<SubscriptionAggregate> findByStatus(SubscriptionStatus status) {
         return jpaRepository.findByStatus(status)
                 .stream()
