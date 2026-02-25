@@ -1,6 +1,7 @@
 package com.investment.lockedtermbasedinvestment.saving.domain.repository;
 
 import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.SubscriptionId;
 
@@ -21,7 +22,7 @@ public interface SubscriptionRepository {
 
     List<SubscriptionAggregate> findHistorySubscribe(UUID walletId);
 
-    List<SubscriptionAggregate> findActiveSubscribe(UUID walletId);
+    List<ActivePackageResponse> findActiveSubscribe(UUID walletId);
 
     List<SubscriptionAggregate> findByStatus(SubscriptionStatus status);
 }

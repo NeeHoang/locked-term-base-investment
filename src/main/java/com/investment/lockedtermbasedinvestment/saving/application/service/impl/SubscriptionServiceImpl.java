@@ -2,6 +2,7 @@ package com.investment.lockedtermbasedinvestment.saving.application.service.impl
 
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.CreateSubscriptionRequest;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.service.SubscriptionService;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.EarningAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.LockedProductAggregate;
@@ -122,7 +123,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<SubscriptionAggregate> getActiveByWalletId(String id) {
+    public List<ActivePackageResponse> getActiveByWalletId(String id) {
         WalletId walletId = WalletId.from(id);
         return subscriptionRepository.findActiveSubscribe(walletId.value());
     }

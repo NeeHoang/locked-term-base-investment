@@ -2,6 +2,7 @@ package com.investment.lockedtermbasedinvestment.saving.api.controller.user;
 
 import com.investment.lockedtermbasedinvestment.common.ApiResponseDTO;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.CreateSubscriptionRequest;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.SubscriptionResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.service.SubscriptionService;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
@@ -129,7 +130,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<ApiResponseDTO<List<SubscriptionResponse>>> getActiveSubscribe(
+    public ResponseEntity<ApiResponseDTO<List<ActivePackageResponse>>> getActiveSubscribe(
             @Parameter(
                     description = "User wallet identifier",
                     required = true,
@@ -138,11 +139,8 @@ public class SubscriptionController {
             @RequestHeader("X-WALLET-ID") String walletId
     ) {
 
-        List<SubscriptionResponse> responses = subscriptionService
-                .getActiveByWalletId(walletId)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        List<ActivePackageResponse> responses = subscriptionService
+                .getActiveByWalletId(walletId);
 
         return ResponseEntity.ok(ApiResponseDTO.ok(
                 "Get all active subscription successfully",

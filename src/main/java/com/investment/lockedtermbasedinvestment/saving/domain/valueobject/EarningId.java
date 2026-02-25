@@ -9,4 +9,8 @@ public record EarningId(Long value) {
             );
         }
     }
+
+    public static EarningId from(Long earningId) {
+        return new EarningId(earningId);
+    }
 }

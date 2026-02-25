@@ -1,6 +1,7 @@
 package com.investment.lockedtermbasedinvestment.saving.application.service;
 
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.CreateSubscriptionRequest;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
 
 import java.util.List;
@@ -15,5 +16,5 @@ public interface SubscriptionService {
 
     List<SubscriptionAggregate> getHistoryByWalletId(String walletId);
 
-    List<SubscriptionAggregate> getActiveByWalletId(String walletId);
+    List<ActivePackageResponse> getActiveByWalletId(String walletId);
 }

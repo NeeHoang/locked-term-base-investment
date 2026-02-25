@@ -11,7 +11,8 @@ public enum WalletErrorCode implements DomainErrorCode {
     INVALID_AMOUNT("WALLET_005", HttpStatus.BAD_REQUEST),
     WALLET_NOT_FOUND("WALLET_006", HttpStatus.NOT_FOUND),
     INVALID_WALLET_ID("WALLET_007", HttpStatus.BAD_REQUEST),
-    WALLET_ID_REQUIRED("WALLET_008", HttpStatus.BAD_REQUEST)
+    WALLET_ID_REQUIRED("WALLET_008", HttpStatus.BAD_REQUEST),
+    ACCESS_DENIED("WALLET_009", HttpStatus.BAD_REQUEST)
     ;
 
     private final String code;

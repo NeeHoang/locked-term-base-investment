@@ -1,6 +1,7 @@
 package com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.impl;
 
 import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.repository.SubscriptionRepository;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.SubscriptionId;
@@ -79,11 +80,11 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     }
 
     @Override
-    public List<SubscriptionAggregate> findActiveSubscribe(UUID walletId) {
-        return jpaRepository.findByWalletIdAndActive(walletId, SubscriptionStatus.ACTIVE)
-                .stream()
-                .map(SubscriptionMapper::toDomain)
-                .toList();
+    public List<ActivePackageResponse> findActiveSubscribe(UUID walletId) {
+        return jpaRepository.findActivePackageByWalletId(
+                walletId,
+                SubscriptionStatus.ACTIVE
+        );
     }
 
     @Override
