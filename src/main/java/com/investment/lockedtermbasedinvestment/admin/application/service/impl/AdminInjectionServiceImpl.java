@@ -35,11 +35,6 @@ public class AdminInjectionServiceImpl implements AdminInjectionService {
     private final LiquidityPoolFactory liquidityPoolFactory;
 
     @Override
-    public AdminInjectionResponse create(AdminInjectionRequest request) {
-        return null;
-    }
-
-    @Override
     @Transactional
     public AdminInjectionResponse inject(InjectionRequest request) {
 

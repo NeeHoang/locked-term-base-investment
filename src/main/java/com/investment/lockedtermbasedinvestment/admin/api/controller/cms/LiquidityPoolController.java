@@ -64,7 +64,9 @@ public class LiquidityPoolController {
             )
     )
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<LiquidityPoolResponse>>> getAll() {
+    public ResponseEntity<ApiResponseDTO<List<LiquidityPoolResponse>>> getAll(
+
+    ) {
 
         List<LiquidityPoolAggregate> aggregates = liquidityPoolService.getAll();
 
@@ -128,10 +130,13 @@ public class LiquidityPoolController {
             @ApiResponse(responseCode = "201", description = "Liquidity injected successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid injection request"),
             @ApiResponse(responseCode = "404", description = "Liquidity pool not found"),
-            @ApiResponse(responseCode = "409", description = "Injection conflict or duplicated request")
+            @ApiResponse(responseCode = "409", description = "Injection ´œconflict or duplicated request")
     })
     @PostMapping("/inject")
     public ResponseEntity<ApiResponseDTO<AdminInjectionResponse>> inject(
+            // hard code 01HXQZK7M9F0A8K3R5YJ2D6V4B
+            @RequestHeader("X-ADMIN-ID") String adminId,
+
             @Valid @RequestBody InjectionRequest request
             ) {
 

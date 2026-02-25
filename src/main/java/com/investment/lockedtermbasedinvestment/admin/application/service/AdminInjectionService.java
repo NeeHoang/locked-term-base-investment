@@ -6,7 +6,5 @@ import com.investment.lockedtermbasedinvestment.admin.api.dto.response.AdminInje
 
 public interface AdminInjectionService {
 
-    AdminInjectionResponse create(AdminInjectionRequest request);
-
     AdminInjectionResponse inject(InjectionRequest request);
 }
