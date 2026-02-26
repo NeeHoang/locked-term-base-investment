@@ -23,6 +23,7 @@ public class LiquidityPoolEntity {
     @Column(name = "min_threshold", precision = 18, scale = 8, nullable = false)
     private BigDecimal minThreshold;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private LiquidityPoolStatus status;
 
@@ -35,5 +36,4 @@ public class LiquidityPoolEntity {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
-
 }

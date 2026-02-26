@@ -52,4 +52,15 @@ public class LiquidityPoolRepositoryImpl implements LiquidityPoolRepository {
                 .map(mapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public LiquidityPoolAggregate findSolo() {
+        LiquidityPoolEntity entity = jpaLiquidityPoolRepository.findSoloRecord();
+
+        if (entity == null) {
+            throw new RuntimeException("Critical Error: Liquidity Pool not initialized in database");
+        }
+
+        return mapper.toDomain(entity);
+    }
 }

@@ -14,6 +14,8 @@ public interface SubscriptionRepository {
 
     Optional<SubscriptionAggregate> findById(SubscriptionId id);
 
+    Optional<SubscriptionAggregate> findByIdAndActive(SubscriptionId id);
+
     void save(SubscriptionAggregate aggregate);
 
     List<SubscriptionAggregate> findProductSubscribeToday();
@@ -25,4 +27,6 @@ public interface SubscriptionRepository {
     List<ActivePackageResponse> findActiveSubscribe(UUID walletId);
 
     List<SubscriptionAggregate> findByStatus(SubscriptionStatus status);
+
+    void update(SubscriptionAggregate aggregate);
 }

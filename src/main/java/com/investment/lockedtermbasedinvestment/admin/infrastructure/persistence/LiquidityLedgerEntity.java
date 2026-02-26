@@ -48,20 +48,52 @@ public class LiquidityLedgerEntity {
             Money liquidityBefore,
             Money debitAmount,
             Money liquidityAfter,
-            byte[] referenceId
+            byte[] earningTxId
     ) {
 
         LiquidityLedgerEntity ledger = new LiquidityLedgerEntity();
 
-        ledger.setTxId(UlidCreator.getUlid().toBytes()); // ULID 16 bytes
+        ledger.setTxId(UlidCreator.getUlid().toBytes());
         ledger.setTxType(LiquidityTransactionType.DAILY_INTEREST);
 
         ledger.setLiquidityBefore(liquidityBefore.toBigDecimal());
         ledger.setAmount(debitAmount.toBigDecimal());
         ledger.setLiquidityAfter(liquidityAfter.toBigDecimal());
 
-        ledger.setReferenceId(referenceId);
+        ledger.setReferenceId(earningTxId);
 
+        return ledger;
+    }
+
+    public static LiquidityLedgerEntity redemptionDebit(
+            Money liquidityBefore,
+            Money amount,
+            Money liquidityAfter,
+            byte[] earningTransactionId
+    ) {
+        LiquidityLedgerEntity ledger = new LiquidityLedgerEntity();
+        ledger.setTxId(UlidCreator.getUlid().toBytes());
+        ledger.setTxType(LiquidityTransactionType.REDEEMED);
+        ledger.setLiquidityBefore(liquidityBefore.toBigDecimal());
+        ledger.setAmount(amount.toBigDecimal());
+        ledger.setLiquidityAfter(liquidityAfter.toBigDecimal());
+        ledger.setReferenceId(earningTransactionId);
+        return ledger;
+    }
+
+    public static LiquidityLedgerEntity EarlyRedeemDebit(
+            Money liquidityBefore,
+            Money amount,
+            Money liquidityAfter,
+            byte[] earningTransactionId
+    ) {
+        LiquidityLedgerEntity ledger = new LiquidityLedgerEntity();
+        ledger.setTxId(UlidCreator.getUlid().toBytes());
+        ledger.setTxType(LiquidityTransactionType.EARLY_REDEEMED);
+        ledger.setLiquidityBefore(liquidityBefore.toBigDecimal());
+        ledger.setAmount(amount.toBigDecimal());
+        ledger.setLiquidityAfter(liquidityAfter.toBigDecimal());
+        ledger.setReferenceId(earningTransactionId);
         return ledger;
     }
 }

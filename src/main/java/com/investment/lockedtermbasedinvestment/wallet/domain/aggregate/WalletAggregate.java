@@ -45,23 +45,40 @@ public class WalletAggregate {
         validateInvariants();
     }
 
-    public void releaseFromEarning(Money amount) {
-        if (amount == null || amount.isNegative() || amount.isZero()) {
+    public void depositEarnings(Money interestAmount) {
+        if (interestAmount == null || interestAmount.isNegative() || interestAmount.isZero()) {
             throw new WalletException(
                     WalletErrorCode.INVALID_AMOUNT,
-                    "Amount must be positive"
+                    "Interest amount must be positive"
             );
         }
 
-        if (!balanceFrozen.isGreaterThanOrEqual(amount)) {
+        this.balanceAvailable = this.balanceAvailable.add(interestAmount);
+        this.totalBalance = this.totalBalance.add(interestAmount);
+
+        validateInvariants();
+    }
+
+    public void releasePrincipalToEarning(Money originalPrincipal) {
+        if (originalPrincipal == null || originalPrincipal.isNegative() || originalPrincipal.isZero()) {
+            throw new WalletException(
+                    WalletErrorCode.INVALID_AMOUNT,
+                    "Principal must be positive");
+        }
+
+        if (!this.balanceFrozen.isGreaterThanOrEqual(originalPrincipal)) {
             throw new WalletException(
                     WalletErrorCode.INSUFFICIENT_BALANCE,
                     "Frozen balance is insufficient to release"
             );
         }
 
-        this.balanceFrozen = balanceFrozen.subtract(amount);
-        this.balanceAvailable = balanceAvailable.add(amount);
+        // Trừ phần tiền gốc đang bị đóng băng
+        this.balanceFrozen = this.balanceFrozen.subtract(originalPrincipal);
+
+        // Vì tiền này đã chuyển sang Earning (không còn nằm trong cấu trúc của Wallet nữa),
+        // nên totalBalance bắt buộc phải giảm theo để đảm bảo invariant.
+        this.totalBalance = this.balanceAvailable.add(this.balanceFrozen);
 
         validateInvariants();
     }

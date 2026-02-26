@@ -1,6 +1,5 @@
 package com.investment.lockedtermbasedinvestment.saving.application.cron;
 
-import com.investment.lockedtermbasedinvestment.saving.api.dto.response.BatchProcessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,8 +15,8 @@ public class DailyInterestAccrualService {
 
     private final DailyInterestAccrualJob accrualJob;
 
-    public BatchProcessResponse trigger(LocalDate runDate) {
-        return accrualJob.accrueDailyInterest(runDate);
+    public void trigger(LocalDate runDate) {
+        accrualJob.accrueDailyInterestOrMature(runDate);
     }
 
     @Scheduled(

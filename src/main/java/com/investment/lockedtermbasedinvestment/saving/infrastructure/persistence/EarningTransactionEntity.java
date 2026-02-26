@@ -23,7 +23,7 @@ public class EarningTransactionEntity {
     @Column(name = "tx_id", nullable = false, updatable = false, columnDefinition = "BYTEA")
     private byte[] txId; // ULID 16 bytes
 
-    @JoinColumn(name = "earning_id", nullable = false)
+    @Column(name = "earning_id", nullable = false)
     private Long earningId;
 
     @Enumerated(EnumType.STRING)
@@ -51,19 +51,79 @@ public class EarningTransactionEntity {
         this.createdAt = Instant.now();
     }
 
-    public static EarningTransactionEntity dailyAccrual(
+//    public static EarningTransactionEntity dailyAccrual(
+//            Long earningId,
+//            Money before,
+//            Money delta,
+//            Money after
+//    ) {
+//        EarningTransactionEntity tx = new EarningTransactionEntity();
+//        tx.setTxId(UlidCreator.getUlid().toBytes());
+//        tx.setEarningId(earningId);
+//        tx.setTxType(EarningTxType.DAILY_INTEREST);
+//        tx.setStatus(EarningTransaction.SUCCESS);
+//        tx.setAvailableBefore(before.toBigDecimal());
+//        tx.setAmount(delta.toBigDecimal());
+//        tx.setAvailableAfter(after.toBigDecimal());
+//        return tx;
+//    }
+//
+//    public static EarningTransactionEntity maturity(
+//            Long earningId,
+//            Money before,
+//            Money principal,
+//            Money after
+//    ) {
+//        EarningTransactionEntity tx = new EarningTransactionEntity();
+//        tx.setTxId(UlidCreator.getUlid().toBytes());
+//        tx.setEarningId(earningId);
+//        tx.setTxType(EarningTxType.REDEEMED);
+//        tx.setStatus(EarningTransaction.SUCCESS);
+//        tx.setAvailableBefore(before.toBigDecimal());
+//        tx.setAmount(principal.toBigDecimal());
+//        tx.setAvailableAfter(after.toBigDecimal());
+//        return tx;
+//    }
+
+    public static EarningTransactionEntity createPending(
+            Long earningId,
+            EarningTxType type,
+            Money before
+    ) {
+        EarningTransactionEntity tx = new EarningTransactionEntity();
+        tx.setTxId(UlidCreator.getUlid().toBytes());
+        tx.setEarningId(earningId);
+        tx.setTxType(type);
+        tx.setStatus(EarningTransaction.PENDING);
+        tx.setAvailableBefore(before.toBigDecimal());
+        tx.setAmount(BigDecimal.ZERO);
+        tx.setAvailableAfter(before.toBigDecimal());
+        return tx;
+    }
+
+    public void markSuccess(Money amount, Money after) {
+        this.status = EarningTransaction.SUCCESS;
+        this.amount = amount.toBigDecimal();
+        this.availableAfter = after.toBigDecimal();
+    }
+
+    public void markFailed() {
+        this.status = EarningTransaction.FAILED;
+    }
+
+    public static EarningTransactionEntity earlyRedeemPending(
             Long earningId,
             Money before,
-            Money delta,
+            Money principal,
             Money after
     ) {
         EarningTransactionEntity tx = new EarningTransactionEntity();
         tx.setTxId(UlidCreator.getUlid().toBytes());
         tx.setEarningId(earningId);
-        tx.setTxType(EarningTxType.DAILY_INTEREST);
-        tx.setStatus(EarningTransaction.SUCCESS);
+        tx.setTxType(EarningTxType.EARLY_REDEEMED);
+        tx.setStatus(EarningTransaction.PENDING);
         tx.setAvailableBefore(before.toBigDecimal());
-        tx.setAmount(delta.toBigDecimal());
+        tx.setAmount(principal.toBigDecimal());
         tx.setAvailableAfter(after.toBigDecimal());
         return tx;
     }

@@ -16,7 +16,10 @@ public class SubscriptionMapper {
                 Money.of(entity.getPrincipal()),
                 new InterestRate(entity.getProduct().getInterestRate()),
                 new TermDays(entity.getProduct().getTermDays()),
-                entity.getStartDate()
+                Money.of(entity.getTotalInterest()),
+                entity.getStartDate(),
+                entity.getMaturityDate(),
+                entity.getStatus()
         );
     }
 

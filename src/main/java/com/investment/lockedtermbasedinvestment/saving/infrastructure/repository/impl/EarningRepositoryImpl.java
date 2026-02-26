@@ -12,8 +12,6 @@ import com.investment.lockedtermbasedinvestment.saving.mapper.EarningMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -80,10 +78,5 @@ public class EarningRepositoryImpl implements EarningRepository {
         entity.setPenaltyRate(earning.getPenaltyRate().value());
         entity.setTermDays(earning.getTermDays().value());
         entity.setProgress(earning.getProgress().value());
-    }
-
-    @Override
-    public List<EarningAggregate> findAllActiveForAccrual(LocalDate today) {
-        return List.of();
     }
 }

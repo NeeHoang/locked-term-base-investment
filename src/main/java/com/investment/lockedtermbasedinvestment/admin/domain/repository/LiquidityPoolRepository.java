@@ -9,4 +9,6 @@ public interface LiquidityPoolRepository {
     void save(LiquidityPoolAggregate aggregate);
 
     List<LiquidityPoolAggregate> findAll();
+
+    LiquidityPoolAggregate findSolo();
 }

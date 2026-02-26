@@ -28,6 +28,7 @@ public class SubscriptionAggregate {
 
     private SubscriptionStatus status;
 
+    // Constructor when create
     public SubscriptionAggregate(
             SubscriptionId id,
             WalletRef walletRef,
@@ -50,6 +51,29 @@ public class SubscriptionAggregate {
         this.status = SubscriptionStatus.ACTIVE;
 
         validateInvariants();
+    }
+
+    // Constructor when reconstruction into DB
+    public SubscriptionAggregate(SubscriptionId id,
+                                 WalletRef walletRef,
+                                 LockedProductId lockedProductId,
+                                 Money principal,
+                                 InterestRate interestRate,
+                                 TermDays termDays,
+                                 Money totalInterest,
+                                 LocalDate startDate,
+                                 LocalDate maturityDate,
+                                 SubscriptionStatus status) {
+        this.id = id;
+        this.walletRef = walletRef;
+        this.lockedProductId = lockedProductId;
+        this.principal = principal;
+        this.interestRate = interestRate;
+        this.termDays = termDays;
+        this.totalInterest = totalInterest;
+        this.startDate = startDate;
+        this.maturityDate = maturityDate;
+        this.status = status;
     }
 
     private void validateInvariants() {
@@ -111,8 +135,10 @@ public class SubscriptionAggregate {
         }
     }
 
-    public void accrueDaily(EarningAggregate earning, LocalDate today) {
-
+    public void accrueDaily(EarningAggregate earning,
+                            LocalDate today,
+                            PenaltyPolicy policy
+    ) {
         if (status != SubscriptionStatus.ACTIVE) {
             return;
         }
@@ -122,12 +148,16 @@ public class SubscriptionAggregate {
         }
 
         if (today.isAfter(maturityDate)) {
-            this.status = SubscriptionStatus.MATURED;
-            earning.mature();
+            mature(earning);
             return;
         }
 
-        earning.accrueOneDay();
+        earning.accrueOneDay(policy);
+
+        if (today.isEqual(maturityDate)) {
+            this.status = SubscriptionStatus.MATURED;
+            earning.mature();
+        }
     }
 
     public boolean isEligibleForDailyAccrual(LocalDate today) {

@@ -65,7 +65,7 @@ public class CMSSubscriptionController {
                 ? date
                 : LocalDate.now(VN_ZONE);
 
-        BatchProcessResponse response = accrualJob.accrueDailyInterest(runDate);
+        BatchProcessResponse response = accrualJob.accrueDailyInterestOrMature(runDate);
 
         return ResponseEntity.ok(ApiResponseDTO.ok(
                 "Daily interest manual cron job successfully",

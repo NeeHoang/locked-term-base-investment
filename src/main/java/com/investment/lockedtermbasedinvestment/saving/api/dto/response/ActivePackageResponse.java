@@ -11,7 +11,7 @@ public record ActivePackageResponse(
         LocalDate startDate,
         LocalDate maturityDate,
         BigDecimal principal,
-        BigDecimal interestRte,
+        BigDecimal interestRate,
         BigDecimal accruedInterest,
         int holdingDays,
         BigDecimal progress,

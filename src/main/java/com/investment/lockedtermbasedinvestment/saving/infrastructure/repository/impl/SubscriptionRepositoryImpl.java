@@ -3,6 +3,8 @@ package com.investment.lockedtermbasedinvestment.saving.infrastructure.repositor
 import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
+import com.investment.lockedtermbasedinvestment.saving.domain.exception.SubscriptionErrorCode;
+import com.investment.lockedtermbasedinvestment.saving.domain.exception.SubscriptionException;
 import com.investment.lockedtermbasedinvestment.saving.domain.repository.SubscriptionRepository;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.SubscriptionId;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.LockedProductEntity;
@@ -28,6 +30,12 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     @Override
     public Optional<SubscriptionAggregate> findById(SubscriptionId id) {
         return jpaRepository.findById(id.value())
+                .map(SubscriptionMapper::toDomain);
+    }
+
+    @Override
+    public Optional<SubscriptionAggregate> findByIdAndActive(SubscriptionId id) {
+        return jpaRepository.findByIdAndActive(id.value())
                 .map(SubscriptionMapper::toDomain);
     }
 
@@ -93,5 +101,18 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
                 .stream()
                 .map(SubscriptionMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public void update(SubscriptionAggregate aggregate) {
+        SubscriptionEntity entity = jpaRepository.findById(aggregate.getId().value())
+                .orElseThrow(() -> new SubscriptionException(
+                        SubscriptionErrorCode.INVALID_SUBSCRIPTION_ID,
+                        "Subscription not found: " + aggregate.getId()
+                ));
+
+        entity.setStatus(aggregate.getStatus());
+
+        jpaRepository.save(entity);
     }
 }

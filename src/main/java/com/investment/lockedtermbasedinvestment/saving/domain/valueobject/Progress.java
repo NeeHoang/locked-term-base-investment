@@ -22,7 +22,9 @@ public record Progress(BigDecimal value) {
         BigDecimal progress = BigDecimal.valueOf(holdingDays)
                 .divide(BigDecimal.valueOf(termDays), 4, RoundingMode.HALF_UP);
 
-        return new Progress(progress);
+        BigDecimal capped = progress.min(BigDecimal.ONE);
+
+        return new Progress(capped);
     }
 
     public boolean lessThan(BigDecimal threshold) {

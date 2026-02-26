@@ -3,6 +3,7 @@ package com.investment.lockedtermbasedinvestment.saving.domain.aggregate;
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.EarningErrorCode;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.EarningException;
+import com.investment.lockedtermbasedinvestment.saving.domain.policy.PenaltyPolicy;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.*;
 import lombok.Getter;
 
@@ -27,6 +28,7 @@ public class EarningAggregate {
     private PenaltyRate penaltyRate;
     private Money penaltyAmount;
 
+    // Constructor for create
     public EarningAggregate(
             SubscriptionId subscriptionId,
             Money principal,
@@ -39,7 +41,7 @@ public class EarningAggregate {
         this.interestPerDay = interestPerDay;
 
         this.holdingDays = HoldingDays.zero();
-        this.progress = Progress.zero();
+        this.progress = Progress.of(0, termDays.value());
 
         this.totalInterest = Money.zero();
         this.available = Money.zero();
@@ -50,6 +52,7 @@ public class EarningAggregate {
         validateInvariants();
     }
 
+    // Constructor for rehydrate into DB
     public EarningAggregate(EarningId id,
                             SubscriptionId subscriptionId,
                             Money principal, TermDays termDays,
@@ -73,7 +76,7 @@ public class EarningAggregate {
     }
 
     //Daily job
-    public void accrueOneDay() {
+    public void accrueOneDay(PenaltyPolicy policy) {
         if (holdingDays.value() >= termDays.value()) return;
 
         this.holdingDays = holdingDays.increment();
@@ -85,11 +88,16 @@ public class EarningAggregate {
         this.totalInterest = totalInterest.add(interestPerDay);
         this.available = available.add(interestPerDay);
 
+        try {
+            this.penaltyRate = policy.penaltyRate(this.progress);
+        } catch (Exception ex) {
+            this.penaltyRate = PenaltyRate.notAllowed();
+        }
         validateInvariants();
     }
 
     //User withdraw
-    public Money withdraw(Money amount) {
+    public void withdraw(Money amount) {
 
         if (amount.isNegative() || amount.isZero()) {
             throw new EarningException(
@@ -108,7 +116,6 @@ public class EarningAggregate {
         this.available = available.subtract(amount);
 
         validateInvariants();
-        return amount;
     }
 
     void earlyRedeem(PenaltyRate penaltyRate) {
@@ -157,11 +164,9 @@ public class EarningAggregate {
             );
         }
 
-        if (available.isGreaterThanOrEqual(principal)) {
-            return; // idempotent
-        }
-
         this.available = available.add(principal);
+        this.penaltyRate = PenaltyRate.of(BigDecimal.ZERO);
+
         validateInvariants();
     }
 
