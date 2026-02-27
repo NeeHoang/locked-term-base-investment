@@ -17,3 +17,9 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.postgresql: DEBUG

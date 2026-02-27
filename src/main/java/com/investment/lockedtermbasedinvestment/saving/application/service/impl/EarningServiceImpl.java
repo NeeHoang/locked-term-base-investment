@@ -1,14 +1,19 @@
 package com.investment.lockedtermbasedinvestment.saving.application.service.impl;
 
 import com.investment.lockedtermbasedinvestment.admin.domain.aggregate.LiquidityPoolAggregate;
+import com.investment.lockedtermbasedinvestment.admin.domain.exception.LiquidityPoolErrorCode;
+import com.investment.lockedtermbasedinvestment.admin.domain.exception.LiquidityPoolException;
 import com.investment.lockedtermbasedinvestment.admin.domain.repository.LiquidityPoolRepository;
 import com.investment.lockedtermbasedinvestment.admin.infrastructure.persistence.LiquidityLedgerEntity;
 import com.investment.lockedtermbasedinvestment.admin.infrastructure.repository.JpaLiquidityLedgerRepository;
 import com.investment.lockedtermbasedinvestment.common.enums.EarningTxType;
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
+import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningSummaryProjection;
 import com.investment.lockedtermbasedinvestment.saving.application.service.EarningService;
+import com.investment.lockedtermbasedinvestment.saving.application.service.EarningTxStatusUpdater;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.EarningAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.EarningErrorCode;
@@ -22,6 +27,7 @@ import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.Earnin
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.WalletRef;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.WithdrawTransactionEntity;
+import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaEarningRepository;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaEarningTransactionRepository;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaWithdrawTransactionRepository;
 import com.investment.lockedtermbasedinvestment.wallet.domain.aggregate.WalletAggregate;
@@ -33,6 +39,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +56,23 @@ public class EarningServiceImpl implements EarningService {
     private final JpaWithdrawTransactionRepository jpaWithdrawTransactionRepository;
     private final JpaEarningTransactionRepository jpaEarningTransactionRepository;
     private final JpaLiquidityLedgerRepository jpaLiquidityLedgerRepository;
+    private final JpaEarningRepository jpaEarningRepository;
+
+    private final EarningTxStatusUpdater earningTxStatusUpdater;
+
+    @Override
+    public EarningSummaryResponse getEarningSummary(String walletId) {
+
+        UUID walletUUID = UUID.fromString(walletId);
+
+        EarningSummaryProjection projection = jpaEarningRepository
+                .sumEarningsByWalletId(walletUUID);
+
+        return new EarningSummaryResponse(
+                projection.getTotalAvailable(),
+                projection.getTotalInterest()
+        );
+    }
 
     @Override
     @Transactional
@@ -156,7 +181,6 @@ public class EarningServiceImpl implements EarningService {
 
         try {
             // Business domain logic
-
             // Calculator penalty rate and update status Active -> Early_REDEEM
             subscription.earlyRedeem(earning, penaltyPolicy);
 
@@ -169,7 +193,8 @@ public class EarningServiceImpl implements EarningService {
 
             // Debit pool Money
             Money poolBefore = liquidityPool.getTotalAmount();
-            liquidityPool.debit(netAmountToDebitFromPool);
+
+            liquidityPool.debit(netAmountToDebitFromPool); // throws LiquidityPoolException
 
             LiquidityLedgerEntity ledgerTx =
                     LiquidityLedgerEntity.EarlyRedeemDebit(
@@ -189,11 +214,24 @@ public class EarningServiceImpl implements EarningService {
             liquidityPoolRepository.save(liquidityPool);
             jpaEarningTransactionRepository.save(tx);
 
+        } catch (LiquidityPoolException ex) {
+            // PENDING: domain logic not persist
+            earningTxStatusUpdater.markPending(tx);
+
+            log.warn("LiquidityPoolError: {}, Early redeem PENDING. earningId={}",
+                    ex.getErrorCode().code() ,earningId);
+
+            throw new LiquidityPoolException(
+                    LiquidityPoolErrorCode.INSUFFICIENT_BALANCE,
+                    "Pool insufficient for early redeem, earningId=" + earningId + ex
+            );
         } catch (Exception ex) {
-            log.error("Early redeem failed for earningId: {}", earningId, ex);
-            tx.markFailed();
-            jpaEarningTransactionRepository.save(tx);
-            throw ex; // Rollback all
+            // FAILED: System error
+            earningTxStatusUpdater.markFailed(tx);
+
+            log.error("[SYSTEM_ERROR] Early redeem FAILED. earningId={}", earningId, ex);
+
+            throw ex;
         }
     }
 }

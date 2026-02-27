@@ -2,6 +2,7 @@ package com.investment.lockedtermbasedinvestment.saving.api.controller.user;
 
 import com.investment.lockedtermbasedinvestment.common.ApiResponseDTO;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.service.EarningService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,17 @@ import org.springframework.web.bind.annotation.*;
 public class EarningController {
 
     private final EarningService earningService;
+
+    @GetMapping("/summary")
+    public ResponseEntity<ApiResponseDTO<EarningSummaryResponse>> getEarningSummary(
+            @RequestHeader("X-WALLET-ID") String walletId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponseDTO.ok(
+                        "Earning summary fetched successfully",
+                        earningService.getEarningSummary(walletId)
+                ));
+    }
 
     @PostMapping("/withdraw")
     public ResponseEntity<ApiResponseDTO<WithdrawResponse>> withdraw(
