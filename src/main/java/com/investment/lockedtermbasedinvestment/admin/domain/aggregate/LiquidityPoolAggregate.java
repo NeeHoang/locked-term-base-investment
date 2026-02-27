@@ -49,12 +49,12 @@ public class LiquidityPoolAggregate {
             );
         }
 
-        if (status == LiquidityPoolStatus.CRITICAL) {
-            throw new LiquidityPoolException(
-                    LiquidityPoolErrorCode.POOL_IN_CRITICAL_STATE,
-                    "Liquidity pool is in CRITICAL state"
-            );
-        }
+//        if (status == LiquidityPoolStatus.CRITICAL) {
+//            throw new LiquidityPoolException(
+//                    LiquidityPoolErrorCode.POOL_IN_CRITICAL_STATE,
+//                    "Liquidity pool is in CRITICAL state"
+//            );
+//        }
 
         this.totalAmount = this.totalAmount.subtract(amount);
         recalculateStatus();
