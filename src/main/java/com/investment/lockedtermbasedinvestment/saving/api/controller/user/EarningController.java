@@ -2,6 +2,7 @@ package com.investment.lockedtermbasedinvestment.saving.api.controller.user;
 
 import com.investment.lockedtermbasedinvestment.common.ApiResponseDTO;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarlyRedeemPreviewResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.service.EarningService;
@@ -51,6 +52,19 @@ public class EarningController {
                 ApiResponseDTO.ok(
                         "Early redeem processed successfully",
                         null)
+        );
+    }
+
+    @GetMapping("/{earningId}/early-redeem/preview")
+    public ResponseEntity<ApiResponseDTO<EarlyRedeemPreviewResponse>> previewEarlyRedeem(
+            @PathVariable Long earningId,
+            @RequestHeader("X-WALLET-ID") String walletId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponseDTO.ok(
+                        "Early redeem preview fetched successfully",
+                        earningService.previewEarlyRedeem(earningId, walletId)
+                )
         );
     }
 

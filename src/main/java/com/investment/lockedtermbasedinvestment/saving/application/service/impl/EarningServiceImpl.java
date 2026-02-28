@@ -9,6 +9,7 @@ import com.investment.lockedtermbasedinvestment.admin.infrastructure.repository.
 import com.investment.lockedtermbasedinvestment.common.enums.EarningTxType;
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarlyRedeemPreviewResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningSummaryProjection;
@@ -24,6 +25,7 @@ import com.investment.lockedtermbasedinvestment.saving.domain.policy.PenaltyPoli
 import com.investment.lockedtermbasedinvestment.saving.domain.repository.EarningRepository;
 import com.investment.lockedtermbasedinvestment.saving.domain.repository.SubscriptionRepository;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.EarningId;
+import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.PenaltyRate;
 import com.investment.lockedtermbasedinvestment.saving.domain.valueobject.WalletRef;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.WithdrawTransactionEntity;
@@ -233,5 +235,67 @@ public class EarningServiceImpl implements EarningService {
 
             throw ex;
         }
+    }
+
+    @Override
+    public EarlyRedeemPreviewResponse previewEarlyRedeem(Long earningId, String walletId) {
+
+        EarningAggregate earning = earningRepository
+                .findById(EarningId.from(earningId))
+                .orElseThrow(() -> new EarningException(
+                        EarningErrorCode.INVALID_EARNING_ID,
+                        "Earning not found with id: " + earningId
+                ));
+
+        SubscriptionAggregate subscription = subscriptionRepository
+                .findByIdAndActive(earning.getSubscriptionId())
+                .orElseThrow(() -> new SubscriptionException(
+                        SubscriptionErrorCode.INVALID_SUBSCRIPTION_ID,
+                        "Subscription not found or not active"
+                ));
+
+        if (!subscription.getWalletRef().value().equals(WalletRef.from(walletId).value())) {
+            throw new WalletException(
+                    WalletErrorCode.ACCESS_DENIED,
+                    "This earning does not belong to the provided wallet"
+            );
+        }
+
+        // Tính penalty — chỉ preview, không persist
+        PenaltyRate penaltyRate = penaltyPolicy.penaltyRate(earning.getProgress());
+
+        Money totalInterest  = earning.getTotalInterest();
+        Money principal      = earning.getPrincipal();
+        Money available      = earning.getAvailable();
+
+        Money penaltyAmount;
+        Money finalReceivable;
+
+        if (!penaltyRate.isAllowed()) {
+            throw new EarningException(
+                    EarningErrorCode.INVALID_PENALTY_RATE,
+                    "Early redemption is not allowed at this progress"
+            );
+        }
+
+        penaltyAmount = totalInterest.multiply(penaltyRate.value());
+
+        if (available.isGreaterThanOrEqual(penaltyAmount)) {
+            finalReceivable = available.subtract(penaltyAmount).add(principal);
+        } else {
+            Money remainingPenalty = penaltyAmount.subtract(available);
+            finalReceivable = principal.subtract(remainingPenalty);
+        }
+
+        return new EarlyRedeemPreviewResponse(
+                earningId,
+                principal.amount(),
+                totalInterest.amount(),
+                earning.getProgress().value(),
+                penaltyRate.value(),
+                penaltyAmount.amount(),
+                finalReceivable.amount()
+        );
+
     }
 }
