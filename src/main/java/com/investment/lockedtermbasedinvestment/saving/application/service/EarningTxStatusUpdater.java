@@ -1,5 +1,6 @@
 package com.investment.lockedtermbasedinvestment.saving.application.service;
 
+import com.investment.lockedtermbasedinvestment.common.enums.EarningTransaction;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaEarningTransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,11 @@ public class EarningTxStatusUpdater {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markFailed(EarningTransactionEntity tx) {
-        tx.markFailed();
-        earningTxRepository.saveAndFlush(tx);
+        earningTxRepository.updateStatus(tx.getTxId(), EarningTransaction.FAILED);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markPending(EarningTransactionEntity tx) {
-        // status = PENDING
-        earningTxRepository.saveAndFlush(tx);
+        earningTxRepository.updateStatus(tx.getTxId(), EarningTransaction.PENDING);
     }
 }

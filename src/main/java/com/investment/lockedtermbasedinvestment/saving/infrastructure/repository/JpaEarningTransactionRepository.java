@@ -1,8 +1,10 @@
 package com.investment.lockedtermbasedinvestment.saving.infrastructure.repository;
 
+import com.investment.lockedtermbasedinvestment.common.enums.EarningTransaction;
 import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningTxProjection;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -31,4 +33,11 @@ public interface JpaEarningTransactionRepository extends JpaRepository<EarningTr
     ORDER BY et.createdAt DESC
 """)
     List<EarningTxProjection> findAllByWalletId(@Param("walletId") UUID walletId);
+
+    @Modifying
+    @Query("UPDATE EarningTransactionEntity e SET e.status = :status WHERE e.txId = :txId")
+    void updateStatus(
+            @Param("txId") byte[] txId,
+            @Param("status") EarningTransaction status
+            );
 }

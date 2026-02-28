@@ -163,6 +163,14 @@ public class EarningServiceImpl implements EarningService {
             );
         }
 
+        PenaltyRate penaltyRate = penaltyPolicy.penaltyRate(earning.getProgress());
+        if (!penaltyRate.isAllowed()) {
+            throw new EarningException(
+                    EarningErrorCode.INVALID_PENALTY_RATE,
+                    "Early redemption is not allowed, progress: " + earning.getProgress().value() + "%"
+            );
+        }
+
         WalletAggregate wallet = walletRepository
                 .findById(WalletId.from(walletId))
                 .orElseThrow(() -> new WalletException(
