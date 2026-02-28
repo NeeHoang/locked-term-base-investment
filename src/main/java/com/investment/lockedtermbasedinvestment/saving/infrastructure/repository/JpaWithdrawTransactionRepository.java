@@ -1,5 +1,6 @@
 package com.investment.lockedtermbasedinvestment.saving.infrastructure.repository;
 
+import com.investment.lockedtermbasedinvestment.saving.application.dto.WithdrawTxProjection;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.WithdrawTransactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,13 +14,20 @@ import java.util.UUID;
 public interface JpaWithdrawTransactionRepository extends JpaRepository<WithdrawTransactionEntity, byte[]> {
 
     @Query("""
-        SELECT wt FROM WithdrawTransactionEntity wt
-        JOIN EarningEntity e ON wt.earningId = e.id
-        JOIN e.subscription s
-        WHERE s.walletId = :walletId
-        ORDER BY wt.createdAt DESC
-        """)
-    List<WithdrawTransactionEntity> findAllByWalletId(
-            @Param("walletId")UUID walletId
-    );
+    SELECT
+        wt.txId            AS txId,
+        wt.earningId       AS earningId,
+        wt.date            AS date,
+        wt.availableBefore AS availableBefore,
+        wt.amount          AS amount,
+        wt.availableAfter  AS availableAfter,
+        wt.createdAt       AS createdAt,
+        s.subscriptionId   AS subscriptionId
+    FROM WithdrawTransactionEntity wt
+    JOIN EarningEntity e ON wt.earningId = e.id
+    JOIN e.subscription s
+    WHERE s.walletId = :walletId
+    ORDER BY wt.createdAt DESC
+""")
+    List<WithdrawTxProjection> findAllByWalletId(@Param("walletId") UUID walletId);
 }

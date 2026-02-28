@@ -3,10 +3,10 @@ package com.investment.lockedtermbasedinvestment.saving.application.service.impl
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningTransactionResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.InterestTransactionResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawTransactionResponse;
+import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningTxProjection;
+import com.investment.lockedtermbasedinvestment.saving.application.dto.InterestTxProjection;
+import com.investment.lockedtermbasedinvestment.saving.application.dto.WithdrawTxProjection;
 import com.investment.lockedtermbasedinvestment.saving.application.service.TransactionService;
-import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
-import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.InterestTransactionEntity;
-import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.WithdrawTransactionEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaEarningTransactionRepository;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaInterestTransactionRepository;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaWithdrawTransactionRepository;
@@ -61,10 +61,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .toList();
     }
 
-    private WithdrawTransactionResponse mapWithdraw(WithdrawTransactionEntity e) {
+    private WithdrawTransactionResponse mapWithdraw(WithdrawTxProjection e) {
         return new WithdrawTransactionResponse(
                 e.getTxId(),
                 e.getEarningId(),
+                e.getSubscriptionId(),
+                e.getDate(),
                 e.getAvailableBefore(),
                 e.getAmount(),
                 e.getAvailableAfter(),
@@ -72,20 +74,22 @@ public class TransactionServiceImpl implements TransactionService {
         );
     }
 
-    private InterestTransactionResponse mapInterest(InterestTransactionEntity e) {
+    private InterestTransactionResponse mapInterest(InterestTxProjection e) {
         return new InterestTransactionResponse(
                 e.getTxId(),
                 e.getEarningId(),
+                e.getSubscriptionId(),
                 e.getDate(),
                 e.getAmount(),
                 e.getCreatedAt()
         );
     }
 
-    private EarningTransactionResponse mapEarning(EarningTransactionEntity e) {
+    private EarningTransactionResponse mapEarning(EarningTxProjection e) {
         return new EarningTransactionResponse(
                 e.getTxId(),
                 e.getEarningId(),
+                e.getSubscriptionId(),
                 e.getTxType(),
                 e.getStatus(),
                 e.getAvailableBefore(),

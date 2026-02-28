@@ -5,10 +5,12 @@ import com.investment.lockedtermbasedinvestment.common.enums.EarningTxType;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 public record EarningTransactionResponse(
         byte[] txId,
         Long earningId,
+        UUID subscriptionId,
         EarningTxType type,
         EarningTransaction status,
         BigDecimal availableBefore,
