@@ -1,6 +1,8 @@
 package com.investment.lockedtermbasedinvestment.saving.application.service;
 
 import com.investment.lockedtermbasedinvestment.admin.domain.aggregate.LiquidityPoolAggregate;
+import com.investment.lockedtermbasedinvestment.admin.domain.exception.LiquidityPoolErrorCode;
+import com.investment.lockedtermbasedinvestment.admin.domain.exception.LiquidityPoolException;
 import com.investment.lockedtermbasedinvestment.admin.domain.repository.LiquidityPoolRepository;
 import com.investment.lockedtermbasedinvestment.admin.infrastructure.persistence.LiquidityLedgerEntity;
 import com.investment.lockedtermbasedinvestment.admin.infrastructure.repository.JpaLiquidityLedgerRepository;
@@ -40,6 +42,7 @@ public class SubscriptionAccrualProcessor {
     private final JpaEarningTransactionRepository earningTxRepository;
     private final JpaInterestTransactionRepository interestTxRepository;
     private final PenaltyPolicy penaltyPolicy;
+    private final EarningTxStatusUpdater earningTxStatusUpdater;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public void accrueForSubscription(
@@ -92,23 +95,42 @@ public class SubscriptionAccrualProcessor {
         try {
             // Domain logic
             earning.accrueOneDay(penaltyPolicy);
-            Money amount = earning.getInterestPerDay();
+            Money interestAmount = earning.getInterestPerDay();
 
-            // Interest Transaction & Liquidity Ledger
-            recordInterestSafely(earning.getId().value(), today, amount);
-            processLiquidityDebit(amount, tx.getTxId(), LiquidityTransactionType.DAILY_INTEREST);
+            // Debit pool
+            processLiquidityDebit(interestAmount,
+                    tx.getTxId(),
+                    LiquidityTransactionType.DAILY_INTEREST);
+
+            // Pool success -> create InterestTx
+            recordInterestSafely(earning.getId().value(), today, interestAmount);
 
             // Update EarningTransaction PENDING -> SUCCESS
-            tx.markSuccess(amount, earning.getAvailable());
+            tx.markSuccess(interestAmount, earning.getAvailable());
             earningTxRepository.save(tx);
+
+        } catch (LiquidityPoolException ex) {
+            // Pool total amount < interest amount, earningTx Pending
+            earningTxStatusUpdater.markPending(tx);
+
+            log.warn("[POOL_INSUFFICIENT Daily interest PENDING. sub={}, date={}, required={}",
+                    subscription.getId().value(), today, earning.getInterestPerDay()
+            );
+
+            throw new LiquidityPoolException(
+                    LiquidityPoolErrorCode.INSUFFICIENT_BALANCE,
+                    "Pool totalAmount not enough for debit daily interest, sub=" + subscription.getId().value()
+            );
 
         } catch (Exception ex) {
-            log.error("Failed to accrue interest for sub: {}", subscription.getId(), ex);
+            // System error -> FAILED
+            earningTxStatusUpdater.markFailed(tx);
 
-            tx.markFailed();
-            earningTxRepository.save(tx);
+            log.error("[SYSTEM_ERROR] Daily interest FAILED. sub={}, date={}",
+                    subscription.getId().value(), today, ex
+            );
 
-            throw ex; // Re-throw for Rollback Earning/Pool aggregate
+            throw ex; // Rollback earning aggregate (earningRepository.update not called)
         }
     }
 
@@ -134,12 +156,22 @@ public class SubscriptionAccrualProcessor {
             tx.markSuccess(principal, earning.getAvailable());
             earningTxRepository.save(tx);
 
+        } catch (LiquidityPoolException ex) {
+            earningTxStatusUpdater.markPending(tx);
+
+            log.warn("[POOL_INSUFFICIENT] Maturity PENDING. sub={}",
+                    subscription.getId().value());
+
+            throw new LiquidityPoolException(
+                    LiquidityPoolErrorCode.INSUFFICIENT_BALANCE,
+                    "Pool totalAmount not enough for debit daily interest, sub=" + subscription.getId().value()
+            );
         } catch (Exception ex) {
-            log.error("Failed to mature subscription: {}", subscription.getId(), ex);
-            tx.markFailed();
-            earningTxRepository.save(tx);
-            throw ex;
-        }
+            earningTxStatusUpdater.markFailed(tx);
+
+            log.error("[SYSTEM_ERROR] Maturity FAILED. sub={}", subscription.getId().value(), ex);
+
+            throw ex;        }
     }
 
     private void processLiquidityDebit(Money amount,
@@ -149,7 +181,8 @@ public class SubscriptionAccrualProcessor {
         LiquidityPoolAggregate pool = loadSoloPool();
         Money poolBefore = pool.getTotalAmount();
 
-        pool.debit(amount);
+        pool.debit(amount); // throws Liquidity pool exception if errors
+
         Money poolAfter = pool.getTotalAmount();
 
         LiquidityLedgerEntity ledger = switch (type) {
