@@ -3,12 +3,15 @@ package com.investment.lockedtermbasedinvestment.saving.api.controller.user;
 import com.investment.lockedtermbasedinvestment.common.ApiResponseDTO;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarlyRedeemPreviewResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.service.EarningService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/earnings")
@@ -64,6 +67,18 @@ public class EarningController {
                 ApiResponseDTO.ok(
                         "Early redeem preview fetched successfully",
                         earningService.previewEarlyRedeem(earningId, walletId)
+                )
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponseDTO<List<EarningResponse>>> getEarnings(
+            @RequestHeader("X-WALLET-ID") String walletId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponseDTO.ok(
+                        "Earnings fetched successfully",
+                        earningService.getEarnings(walletId)
                 )
         );
     }

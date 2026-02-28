@@ -10,6 +10,7 @@ import com.investment.lockedtermbasedinvestment.common.enums.EarningTxType;
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarlyRedeemPreviewResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningSummaryProjection;
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -297,5 +299,24 @@ public class EarningServiceImpl implements EarningService {
                 finalReceivable.amount()
         );
 
+    }
+
+    @Override
+    public List<EarningResponse> getEarnings(String walletId) {
+        UUID walletUUID = UUID.fromString(walletId);
+
+        return jpaEarningRepository
+                .findAllByWalletId(walletUUID)
+                .stream()
+                .map(p -> new EarningResponse(
+                        p.getEarningId(),
+                        p.getTermDays(),
+                        p.getPrincipal(),
+                        p.getAvailableToWithdraw(),
+                        p.getAccruedInterest(),
+                        p.getHoldingDays(),
+                        p.getProgress()
+                ))
+                .toList();
     }
 }

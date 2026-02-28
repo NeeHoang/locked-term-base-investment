@@ -2,8 +2,11 @@ package com.investment.lockedtermbasedinvestment.saving.application.service;
 
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarlyRedeemPreviewResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
+
+import java.util.List;
 
 public interface EarningService {
 
@@ -14,4 +17,7 @@ public interface EarningService {
     void earlyRedeem(Long earningId, String walletId);
 
     EarlyRedeemPreviewResponse previewEarlyRedeem(Long earningId, String walletId);
+
+    List<EarningResponse> getEarnings(String walletId);
+
 }
