@@ -3,6 +3,7 @@ package com.investment.lockedtermbasedinvestment.saving.api.controller.user;
 import com.investment.lockedtermbasedinvestment.common.ApiResponseDTO;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.CreateSubscriptionRequest;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.CompletedSubscriptionResponse;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.SubscriptionResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.service.SubscriptionService;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
@@ -144,6 +145,29 @@ public class SubscriptionController {
 
         return ResponseEntity.ok(ApiResponseDTO.ok(
                 "Get all active subscription successfully",
+                responses
+        ));
+    }
+
+    @Operation(
+            summary = "Get completed subscriptions",
+            description = "Retrieve all subscriptions with status MATURED or EARLY_REDEEMED for the given wallet"
+    )
+    @ApiResponse(responseCode = "200", description = "Completed subscriptions retrieved successfully")
+    @GetMapping("/completed")
+    public ResponseEntity<ApiResponseDTO<List<CompletedSubscriptionResponse>>> getCompletedSubscribe(
+            @Parameter(
+                    description = "User wallet identifier",
+                    required = true,
+                    example = "3ff732cb-cf34-41fe-b587-3d2e8cb93c68"
+            )
+            @RequestHeader("X-WALLET-ID") String walletId
+    ) {
+        List<CompletedSubscriptionResponse> responses = subscriptionService
+                .getCompletedByWalletId(walletId);
+
+        return ResponseEntity.ok(ApiResponseDTO.ok(
+                "Get completed subscriptions successfully",
                 responses
         ));
     }

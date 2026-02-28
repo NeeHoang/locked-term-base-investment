@@ -3,6 +3,7 @@ package com.investment.lockedtermbasedinvestment.saving.application.service.impl
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.CreateSubscriptionRequest;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.CompletedSubscriptionResponse;
 import com.investment.lockedtermbasedinvestment.saving.application.service.SubscriptionService;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.EarningAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.LockedProductAggregate;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -126,5 +128,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public List<ActivePackageResponse> getActiveByWalletId(String id) {
         WalletId walletId = WalletId.from(id);
         return subscriptionRepository.findActiveSubscribe(walletId.value());
+    }
+
+    @Override
+    public List<CompletedSubscriptionResponse> getCompletedByWalletId(String id) {
+        UUID walletUUID = WalletId.from(id).value();
+        return subscriptionRepository.findCompletedSubscribe(walletUUID);
     }
 }

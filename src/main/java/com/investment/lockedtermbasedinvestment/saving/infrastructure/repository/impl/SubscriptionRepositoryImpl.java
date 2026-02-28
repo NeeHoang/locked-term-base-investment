@@ -2,6 +2,7 @@ package com.investment.lockedtermbasedinvestment.saving.infrastructure.repositor
 
 import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.CompletedSubscriptionResponse;
 import com.investment.lockedtermbasedinvestment.saving.domain.aggregate.SubscriptionAggregate;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.SubscriptionErrorCode;
 import com.investment.lockedtermbasedinvestment.saving.domain.exception.SubscriptionException;
@@ -114,5 +115,13 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
         entity.setStatus(aggregate.getStatus());
 
         jpaRepository.save(entity);
+    }
+
+    @Override
+    public List<CompletedSubscriptionResponse> findCompletedSubscribe(UUID walletId) {
+        return jpaRepository.findCompletedByWalletId(
+                walletId,
+                List.of(SubscriptionStatus.MATURED,SubscriptionStatus.EARLY_REDEEMED)
+        );
     }
 }

@@ -2,6 +2,7 @@ package com.investment.lockedtermbasedinvestment.saving.infrastructure.repositor
 
 import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.CompletedSubscriptionResponse;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.SubscriptionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -57,7 +58,8 @@ public interface JpaSubscriptionRepository extends JpaRepository<SubscriptionEnt
     );
 
     @Query("""
-select new com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse(
+
+            select new com.investment.lockedtermbasedinvestment.saving.api.dto.response.ActivePackageResponse(
     s.subscriptionId,
     e.id,
     p.id,
@@ -69,15 +71,44 @@ select new com.investment.lockedtermbasedinvestment.saving.api.dto.response.Acti
     e.holdingDays,
     e.progress,
     e.available
-)
-from SubscriptionEntity s
-join s.product p
-join EarningEntity e on e.subscription = s
-where s.walletId = :walletId
+            )
+            from SubscriptionEntity s
+            join s.product p
+            join EarningEntity e on e.subscription = s
+            where s.walletId = :walletId
   and s.status = :status
 """)
     List<ActivePackageResponse> findActivePackageByWalletId(
             UUID walletId,
             SubscriptionStatus status
+    );
+
+    @Query("""
+    SELECT new com.investment.lockedtermbasedinvestment.saving.api.dto.response.CompletedSubscriptionResponse(
+        s.subscriptionId,
+        e.termDays,
+        s.principal,
+        p.interestRate,
+        e.totalInterest,
+        s.principal + e.totalInterest,
+        s.startDate,
+        s.maturityDate,
+        cast(s.status as string),
+        e.penaltyRate,
+        CASE WHEN s.status = 'EARLY_REDEEMED'
+             THEN 1 - e.penaltyRate
+             ELSE NULL
+        END
+    )
+    FROM SubscriptionEntity s
+    JOIN s.product p
+    JOIN EarningEntity e ON e.subscription = s
+    WHERE s.walletId = :walletId
+      AND s.status IN :statuses
+    ORDER BY s.maturityDate DESC
+""")
+    List<CompletedSubscriptionResponse> findCompletedByWalletId(
+            @Param("walletId") UUID walletId,
+            @Param("statuses") List<SubscriptionStatus> statuses
     );
 }
