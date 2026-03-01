@@ -18,7 +18,6 @@ import com.investment.lockedtermbasedinvestment.saving.domain.repository.Earning
 import com.investment.lockedtermbasedinvestment.saving.domain.repository.SubscriptionRepository;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.InterestTransactionEntity;
-import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaEarningTransactionRepository;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaInterestTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +38,6 @@ public class SubscriptionAccrualProcessor {
     private final SubscriptionRepository subscriptionRepository;
     private final LiquidityPoolRepository liquidityPoolRepository;
     private final JpaLiquidityLedgerRepository liquidityLedgerRepository;
-    private final JpaEarningTransactionRepository earningTxRepository;
     private final JpaInterestTransactionRepository interestTxRepository;
     private final PenaltyPolicy penaltyPolicy;
     private final EarningTxStatusUpdater earningTxStatusUpdater;
