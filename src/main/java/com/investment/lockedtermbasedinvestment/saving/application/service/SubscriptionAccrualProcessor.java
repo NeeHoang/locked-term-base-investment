@@ -84,13 +84,12 @@ public class SubscriptionAccrualProcessor {
 
         Money before = earning.getAvailable();
 
-        // Create log PENDING and saveAndFlush
-        EarningTransactionEntity tx = EarningTransactionEntity
-                .createPending(
-                        earning.getId().value(),
-                        EarningTxType.DAILY_INTEREST,
-                        before);
-        earningTxRepository.saveAndFlush(tx);
+        // REQUIRES_NEW → commit ngay, row visible với mọi transaction sau
+        EarningTransactionEntity tx = earningTxStatusUpdater.savePending(
+                earning.getId().value(),
+                EarningTxType.DAILY_INTEREST,
+                before
+        );
 
         try {
             // Domain logic
@@ -106,8 +105,7 @@ public class SubscriptionAccrualProcessor {
             recordInterestSafely(earning.getId().value(), today, interestAmount);
 
             // Update EarningTransaction PENDING -> SUCCESS
-            tx.markSuccess(interestAmount, earning.getAvailable());
-            earningTxRepository.save(tx);
+            earningTxStatusUpdater.markSuccess(tx, interestAmount, earning.getAvailable());
 
         } catch (LiquidityPoolException ex) {
             // Pool total amount < interest amount, earningTx Pending
@@ -138,11 +136,11 @@ public class SubscriptionAccrualProcessor {
                                      EarningAggregate earning) {
         Money before = earning.getAvailable();
 
-        EarningTransactionEntity tx = EarningTransactionEntity
-                .createPending(
-                        earning.getId().value(),
-                        EarningTxType.REDEEMED, before);
-        earningTxRepository.saveAndFlush(tx);
+        EarningTransactionEntity tx = earningTxStatusUpdater.savePending(
+                earning.getId().value(),
+                EarningTxType.REDEEMED,
+                before
+        );
 
         try {
             // Domain logic (Status ACTIVE -> MATURE)
@@ -153,8 +151,7 @@ public class SubscriptionAccrualProcessor {
             processLiquidityDebit(principal, tx.getTxId(), LiquidityTransactionType.REDEEMED);
 
             // Update status EarningTransaction PENDING -> SUCCESS
-            tx.markSuccess(principal, earning.getAvailable());
-            earningTxRepository.save(tx);
+            earningTxStatusUpdater.markSuccess(tx, principal, earning.getAvailable());
 
         } catch (LiquidityPoolException ex) {
             earningTxStatusUpdater.markPending(tx);

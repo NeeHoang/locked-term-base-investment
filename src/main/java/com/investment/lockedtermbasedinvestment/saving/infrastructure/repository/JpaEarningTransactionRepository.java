@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ public interface JpaEarningTransactionRepository extends JpaRepository<EarningTr
     JOIN EarningEntity e ON et.earningId = e.id
     JOIN e.subscription s
     WHERE s.walletId = :walletId
+    AND et.status != "FAILED"
     ORDER BY et.createdAt DESC
 """)
     List<EarningTxProjection> findAllByWalletId(@Param("walletId") UUID walletId);
@@ -39,5 +41,20 @@ public interface JpaEarningTransactionRepository extends JpaRepository<EarningTr
     void updateStatus(
             @Param("txId") byte[] txId,
             @Param("status") EarningTransaction status
-            );
+    );
+
+    @Modifying
+    @Query("""
+    UPDATE EarningTransactionEntity e
+    SET e.status = :status,
+        e.amount = :amount,
+        e.availableAfter = :availableAfter
+    WHERE e.txId = :txId
+""")
+    void updateSuccessStatus(
+            @Param("txId") byte[] txId,
+            @Param("status") EarningTransaction status,
+            @Param("amount") BigDecimal amount,
+            @Param("availableAfter") BigDecimal availableAfter
+    );
 }
