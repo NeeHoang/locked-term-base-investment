@@ -96,7 +96,7 @@ public interface JpaSubscriptionRepository extends JpaRepository<SubscriptionEnt
         cast(s.status as string),
         e.penaltyRate,
         CASE WHEN s.status = 'EARLY_REDEEMED'
-             THEN 1 - e.penaltyRate
+             THEN (1 - e.penaltyRate) * p.interestRate
              ELSE NULL
         END
     )
