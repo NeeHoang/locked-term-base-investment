@@ -13,7 +13,9 @@ public interface JpaLiquidityLedgerRepository extends JpaRepository<LiquidityLed
 
     @Query("""
         SELECT new com.investment.lockedtermbasedinvestment.admin.api.dto.response.LiquidityLedgerResponse(
-            l.amount, l.liquidityAfter
+            CASE WHEN l.liquidityAfter < l.liquidityBefore THEN -l.amount ELSE l.amount END,
+                l.liquidityAfter,
+                l.createdAt
         )
         FROM LiquidityLedgerEntity l
         ORDER BY l.createdAt DESC
