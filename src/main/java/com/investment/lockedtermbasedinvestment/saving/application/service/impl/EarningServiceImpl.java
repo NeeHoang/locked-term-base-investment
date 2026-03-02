@@ -9,10 +9,7 @@ import com.investment.lockedtermbasedinvestment.admin.infrastructure.repository.
 import com.investment.lockedtermbasedinvestment.common.enums.EarningTxType;
 import com.investment.lockedtermbasedinvestment.common.sharekernel.Money;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.request.WithdrawRequest;
-import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarlyRedeemPreviewResponse;
-import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningResponse;
-import com.investment.lockedtermbasedinvestment.saving.api.dto.response.EarningSummaryResponse;
-import com.investment.lockedtermbasedinvestment.saving.api.dto.response.WithdrawResponse;
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.*;
 import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningSummaryProjection;
 import com.investment.lockedtermbasedinvestment.saving.application.service.EarningService;
 import com.investment.lockedtermbasedinvestment.saving.application.service.EarningTxStatusUpdater;
@@ -326,5 +323,10 @@ public class EarningServiceImpl implements EarningService {
                         p.getProgress()
                 ))
                 .toList();
+    }
+
+    @Override
+    public SumInterestPerDay getEtsDailyInterest() {
+        return jpaEarningRepository.findSumInterestPerDay();
     }
 }

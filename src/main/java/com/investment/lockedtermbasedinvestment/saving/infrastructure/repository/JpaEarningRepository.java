@@ -1,5 +1,6 @@
 package com.investment.lockedtermbasedinvestment.saving.infrastructure.repository;
 
+import com.investment.lockedtermbasedinvestment.saving.api.dto.response.SumInterestPerDay;
 import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningListProjection;
 import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningSummaryProjection;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningEntity;
@@ -42,4 +43,10 @@ public interface JpaEarningRepository extends JpaRepository<EarningEntity, Long>
     ORDER BY e.id DESC
 """)
     List<EarningListProjection> findAllByWalletId(@Param("walletId") UUID walletId);
+
+    @Query("""
+        SELECT SUM(e.interestPerDay)
+        FROM EarningEntity e
+    """)
+    SumInterestPerDay findSumInterestPerDay();
 }
