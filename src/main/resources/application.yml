@@ -2,24 +2,9 @@ spring:
   application:
     name: locked-saving-service
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/locked_saving_db
-    username: ${SPRING_DATASOURCE_USERNAME:saving}
-    password: ${SPRING_DATASOURCE_PASSWORD:123}
-    driver-class-name: org.postgresql.Driver
-
   jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
     properties:
       hibernate:
         format_sql: true
         jdbc:
           time_zone: UTC
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
-    org.postgresql: DEBUG
