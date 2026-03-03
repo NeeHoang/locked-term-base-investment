@@ -1,6 +1,7 @@
 package com.investment.lockedtermbasedinvestment.saving.infrastructure.repository;
 
 import com.investment.lockedtermbasedinvestment.common.enums.EarningTransaction;
+import com.investment.lockedtermbasedinvestment.common.enums.EarningTxType;
 import com.investment.lockedtermbasedinvestment.saving.application.dto.EarningTxProjection;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,10 +12,26 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface JpaEarningTransactionRepository extends JpaRepository<EarningTransactionEntity, byte[]> {
+
+    @Query("""
+    SELECT et
+    FROM EarningTransactionEntity et
+    WHERE et.earningId = :earningId
+      AND et.txType = :txType
+      AND et.status = :status
+    ORDER BY et.createdAt DESC
+    LIMIT 1
+""")
+    Optional<EarningTransactionEntity> findLatestPending(
+            @Param("earningId") Long earningId,
+            @Param("txType") EarningTxType txType,
+            @Param("status") EarningTransaction status
+    );
 
     @Query("""
     SELECT

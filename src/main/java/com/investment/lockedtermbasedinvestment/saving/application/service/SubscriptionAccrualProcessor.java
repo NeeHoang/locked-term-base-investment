@@ -91,7 +91,7 @@ public class SubscriptionAccrualProcessor {
         Money before = earning.getAvailable();
 
         // REQUIRES_NEW → commit ngay, row visible với mọi transaction sau
-        EarningTransactionEntity tx = earningTxStatusUpdater.savePending(
+        EarningTransactionEntity tx = earningTxStatusUpdater.getOrCreatePending(
                 earning.getId().value(),
                 EarningTxType.DAILY_INTEREST,
                 before
@@ -142,7 +142,7 @@ public class SubscriptionAccrualProcessor {
                                      EarningAggregate earning) {
         Money before = earning.getAvailable();
 
-        EarningTransactionEntity tx = earningTxStatusUpdater.savePending(
+        EarningTransactionEntity tx = earningTxStatusUpdater.getOrCreatePending(
                 earning.getId().value(),
                 EarningTxType.REDEEMED,
                 before
