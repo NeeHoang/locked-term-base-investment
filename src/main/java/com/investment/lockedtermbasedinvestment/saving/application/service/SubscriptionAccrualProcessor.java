@@ -43,37 +43,45 @@ public class SubscriptionAccrualProcessor {
     private final EarningTxStatusUpdater earningTxStatusUpdater;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-    public void accrueForSubscription(
+    public void accrueInterestForSubscription(
             SubscriptionAggregate subscription,
             LocalDate today
     ) {
+        if (!subscription.isEligibleForDailyAccrual(today)
+            || today.isAfter(subscription.getMaturityDate())) return;
 
-        EarningAggregate earning = earningRepository
-                .findBySubscriptionId(subscription.getId())
-                .orElseThrow(() -> new IllegalStateException(
-                        "Earning not found for subscription " + subscription.getId()
-                ));
 
-        // Daily interest
-        if (
-                subscription.isEligibleForDailyAccrual(today)
-                && !today.isAfter(subscription.getMaturityDate())
-        ) {
-            processInterestStep(subscription, earning, today);
-        }
+        EarningAggregate earning = loadEarning(subscription);
 
-        // Mature
-        if (
-                subscription.getStatus() == SubscriptionStatus.ACTIVE
-                        && (today.isEqual(subscription.getMaturityDate())
-                        || today.isAfter(subscription.getMaturityDate()))
-        ) {
-            processMaturityStep(subscription, earning);
-        }
+        processInterestStep(subscription, earning, today);
 
-        // Update aggregate
         earningRepository.update(earning);
         subscriptionRepository.update(subscription);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public void matureSubscriptionIfEligible(
+            SubscriptionAggregate subscription,
+            LocalDate today
+    ) {
+        if (subscription.getStatus() != SubscriptionStatus.ACTIVE) return;
+        if (today.isBefore(subscription.getMaturityDate())
+            && !today.isEqual(subscription.getMaturityDate())) return;
+
+        EarningAggregate earning = loadEarning(subscription);
+
+        processMaturityStep(subscription, earning);
+
+        earningRepository.update(earning);
+        subscriptionRepository.update(subscription);
+    }
+
+    private EarningAggregate loadEarning(SubscriptionAggregate subscription) {
+        return earningRepository
+                .findBySubscriptionId(subscription.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Earning not found for subscription " + subscription.getId().value()
+                ));
     }
 
     private void processInterestStep(SubscriptionAggregate subscription,

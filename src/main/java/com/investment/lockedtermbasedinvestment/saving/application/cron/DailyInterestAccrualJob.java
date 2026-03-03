@@ -1,5 +1,6 @@
 package com.investment.lockedtermbasedinvestment.saving.application.cron;
 
+import com.investment.lockedtermbasedinvestment.admin.domain.exception.LiquidityPoolException;
 import com.investment.lockedtermbasedinvestment.common.enums.BatchStatus;
 import com.investment.lockedtermbasedinvestment.common.enums.SubscriptionStatus;
 import com.investment.lockedtermbasedinvestment.saving.api.dto.response.BatchProcessResponse;
@@ -22,7 +23,6 @@ import java.util.List;
 public class DailyInterestAccrualJob {
 
     private final SubscriptionRepository subscriptionRepository;
-
     private final SubscriptionAccrualProcessor accrualProcessor;
 
     public BatchProcessResponse accrueDailyInterestOrMature(LocalDate today) {
@@ -35,7 +35,7 @@ public class DailyInterestAccrualJob {
         int skipped = 0;
         int ignored = 0;
 
-        List<SkippedItemResponse> duplicates = new ArrayList<>();
+        List<SkippedItemResponse> skippedItems = new ArrayList<>();
 
         for (SubscriptionAggregate subscription : allActive) {
 
@@ -44,61 +44,104 @@ public class DailyInterestAccrualJob {
                 continue;
             }
 
-            try {
-                accrualProcessor.accrueForSubscription(subscription, today);
+            boolean interestOk = processInterest(subscription, today, skippedItems);
+            processMature(subscription, today, skippedItems);
+
+            if (interestOk) {
                 processed++;
-
-            } catch (DuplicateDailyInterestException ex) {
+            } else {
                 skipped++;
-                duplicates.add(new SkippedItemResponse(
-                        subscription.getId().value().toString(),
-                        ex.getEarningId(),
-                        "DUPLICATE_DAILY_INTEREST"
-                ));
-
-                log.info(
-                        "Skip duplicate interest. subscriptionId={}, earningId={}",
-                        subscription.getId(),
-                        ex.getEarningId()
-                );
-            } catch (Exception ex) {
-                skipped++;
-                duplicates.add(new SkippedItemResponse(
-                        subscription.getId().value().toString(),
-                        null,
-                        "UNEXPECTED_ERROR"
-                ));
-
-                log.error(
-                        "Daily interest failed. subscriptionId={}, data={}",
-                        subscription.getId(),
-                        today,
-                        ex
-                );
             }
         }
-
-        BatchStatus status;
-        if (processed == 0 && skipped == 0) {
-            status = BatchStatus.SUCCESS;
-        } else if (processed + skipped == total) {
-            status = BatchStatus.SUCCESS;
-        } else if (processed == 0) {
-            status = BatchStatus.FAILED;
-        } else {
-            status = BatchStatus.PARTIAL_SUCCESS;
-        }
+        BatchStatus status = resolveBatchStatus(total, processed, skipped, ignored);
 
         return new BatchProcessResponse(
                 status,
                 today,
                 new BatchProcessResponse.Summary(
-                        total,
-                        processed,
-                        skipped,
-                        ignored
+                        total, processed, skipped, ignored
                 ),
-                List.copyOf(duplicates)
+                List.copyOf(skippedItems)
         );
+    }
+
+    private boolean processInterest(SubscriptionAggregate subscription,
+                                    LocalDate today,
+                                    List<SkippedItemResponse> skippedItems) {
+        try {
+            accrualProcessor.accrueInterestForSubscription(subscription, today);
+            return true;
+
+        } catch (DuplicateDailyInterestException exception) {
+            skippedItems.add(new SkippedItemResponse(
+                    subscription.getId().value().toString(),
+                    exception.getEarningId(),
+                    "DUPLICATE_DAILY_INTEREST"
+            ));
+
+            log.info("Skip duplicate interest. subscriptionId={}, earningId={}",
+                    subscription.getId().value(), exception.getEarningId());
+            return false;
+
+        } catch (LiquidityPoolException ex) {
+            skippedItems.add(new SkippedItemResponse(
+                    subscription.getId().value().toString(),
+                    null,
+                    "POOL_INSUFFICIENT_INTEREST"
+            ));
+
+            log.warn("[POOL_INSUFFICIENT] Daily interest PENDING. subscriptionId={}, date={}",
+                    subscription.getId(), today);
+            return false;
+
+        } catch (Exception ex) {
+            skippedItems.add(new SkippedItemResponse(
+                    subscription.getId().value().toString(),
+                    null,
+                    "UNEXPECTED_ERROR"
+            ));
+            log.error("[SYSTEM_ERROR] Daily interest FAILED. subscriptionId={}, date={}",
+                    subscription.getId(), today, ex);
+            return false;
+        }
+    }
+
+    private void processMature(SubscriptionAggregate subscription,
+                               LocalDate today,
+                               List<SkippedItemResponse> skippedItems) {
+        try {
+            SubscriptionAggregate fresh = subscriptionRepository
+                    .findById(subscription.getId())
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Subscription not found: " + subscription.getId().value()
+                    ));
+            accrualProcessor.matureSubscriptionIfEligible(fresh, today);
+
+        } catch (LiquidityPoolException ex) {
+            skippedItems.add(new SkippedItemResponse(
+                    subscription.getId().value().toString(),
+                    null,
+                    "POOL_INSUFFICIENT_MATURE"
+            ));
+            log.warn("[POOL_INSUFFICIENT] Maturity PENDING. subscriptionId={}",
+                    subscription.getId());
+
+        } catch (Exception ex) {
+            skippedItems.add(new SkippedItemResponse(
+                    subscription.getId().value().toString(),
+                    null,
+                    "MATURE_ERROR"
+            ));
+            log.error("[SYSTEM_ERROR] Maturity FAILED. subscriptionId={}",
+                    subscription.getId(), ex);
+        }
+    }
+
+    private BatchStatus resolveBatchStatus(int total, int processed, int skipped, int ignored) {
+        int actionable = total - ignored;
+        if (actionable == 0)       return BatchStatus.SUCCESS;
+        if (skipped == 0)          return BatchStatus.SUCCESS;
+        if (processed == 0)        return BatchStatus.FAILED;
+        return BatchStatus.PARTIAL_SUCCESS;
     }
 }
