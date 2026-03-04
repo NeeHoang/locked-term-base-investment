@@ -10,6 +10,7 @@ A backend service for managing locked-term savings products, built with Spring B
 |---|---|
 | 🌐 Backend API | https://locked-term-base-investment.onrender.com |
 | 📖 Swagger UI | https://locked-term-base-investment.onrender.com/swagger-ui.html |
+| 🖥️ Frontend Repository | https://github.com/Hoawt2/locked-termbase-products |
 
 ---
 
