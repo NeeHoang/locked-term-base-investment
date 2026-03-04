@@ -4,6 +4,15 @@ A backend service for managing locked-term savings products, built with Spring B
 
 ---
 
+## 🔗 Live URLs
+
+| | URL |
+|---|---|
+| 🌐 Backend API | https://locked-term-base-investment.onrender.com |
+| 📖 Swagger UI | https://locked-term-base-investment.onrender.com/swagger-ui.html |
+
+---
+
 ## 🏗️ Architecture
 
 The system is organized into **3 bounded contexts**:
