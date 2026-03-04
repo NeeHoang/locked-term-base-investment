@@ -38,10 +38,10 @@ public class EarningEntity extends AuditableEntity {
     @Column(name = "progress", precision = 5, scale = 2, nullable = false)
     private BigDecimal progress;
 
-    @Column(name = "penalty_rate", precision = 5, scale = 2, nullable = false)
+    @Column(name = "penalty_rate", precision = 5, scale = 4, nullable = false)
     private BigDecimal penaltyRate;
 
-    @Column(name = "penalty_amount", precision = 5, scale = 2, nullable = false)
+    @Column(name = "penalty_amount", precision = 5, scale = 8, nullable = false)
     private BigDecimal penaltyAmount;
 
     @Column(name = "holding_days", nullable = false)

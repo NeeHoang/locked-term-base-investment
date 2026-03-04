@@ -20,7 +20,7 @@ public class LockedProductEntity extends AuditableEntity {
     @Column(name = "term_days", nullable = false)
     private Integer termDays;
 
-    @Column(name = "interest_rate", nullable = false, precision = 5, scale = 2)
+    @Column(name = "interest_rate", nullable = false, precision = 5, scale = 4)
     private BigDecimal interestRate;
 
     @Column(name = "min_amount", precision = 18, scale = 8)

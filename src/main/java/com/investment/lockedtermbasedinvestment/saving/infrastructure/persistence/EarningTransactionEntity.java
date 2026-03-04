@@ -51,40 +51,6 @@ public class EarningTransactionEntity {
         this.createdAt = Instant.now();
     }
 
-//    public static EarningTransactionEntity dailyAccrual(
-//            Long earningId,
-//            Money before,
-//            Money delta,
-//            Money after
-//    ) {
-//        EarningTransactionEntity tx = new EarningTransactionEntity();
-//        tx.setTxId(UlidCreator.getUlid().toBytes());
-//        tx.setEarningId(earningId);
-//        tx.setTxType(EarningTxType.DAILY_INTEREST);
-//        tx.setStatus(EarningTransaction.SUCCESS);
-//        tx.setAvailableBefore(before.toBigDecimal());
-//        tx.setAmount(delta.toBigDecimal());
-//        tx.setAvailableAfter(after.toBigDecimal());
-//        return tx;
-//    }
-//
-//    public static EarningTransactionEntity maturity(
-//            Long earningId,
-//            Money before,
-//            Money principal,
-//            Money after
-//    ) {
-//        EarningTransactionEntity tx = new EarningTransactionEntity();
-//        tx.setTxId(UlidCreator.getUlid().toBytes());
-//        tx.setEarningId(earningId);
-//        tx.setTxType(EarningTxType.REDEEMED);
-//        tx.setStatus(EarningTransaction.SUCCESS);
-//        tx.setAvailableBefore(before.toBigDecimal());
-//        tx.setAmount(principal.toBigDecimal());
-//        tx.setAvailableAfter(after.toBigDecimal());
-//        return tx;
-//    }
-
     public static EarningTransactionEntity createPending(
             Long earningId,
             EarningTxType type,
@@ -105,26 +71,5 @@ public class EarningTransactionEntity {
         this.status = EarningTransaction.SUCCESS;
         this.amount = amount.toBigDecimal();
         this.availableAfter = after.toBigDecimal();
-    }
-
-    public void markFailed() {
-        this.status = EarningTransaction.FAILED;
-    }
-
-    public static EarningTransactionEntity earlyRedeemPending(
-            Long earningId,
-            Money before,
-            Money principal,
-            Money after
-    ) {
-        EarningTransactionEntity tx = new EarningTransactionEntity();
-        tx.setTxId(UlidCreator.getUlid().toBytes());
-        tx.setEarningId(earningId);
-        tx.setTxType(EarningTxType.EARLY_REDEEMED);
-        tx.setStatus(EarningTransaction.PENDING);
-        tx.setAvailableBefore(before.toBigDecimal());
-        tx.setAmount(principal.toBigDecimal());
-        tx.setAvailableAfter(after.toBigDecimal());
-        return tx;
     }
 }
