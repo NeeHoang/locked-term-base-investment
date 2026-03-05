@@ -33,6 +33,12 @@ public interface JpaSubscriptionRepository extends JpaRepository<SubscriptionEnt
 
     List<SubscriptionEntity> findByWalletId(UUID walletId);
 
+    @Query("""
+    SELECT s
+    FROM SubscriptionEntity s
+    JOIN FETCH s.lockedProduct
+    WHERE s.status = :status
+""")
     List<SubscriptionEntity> findByStatus(SubscriptionStatus status);
 
     @Query("""

@@ -15,6 +15,7 @@ import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository
 import com.investment.lockedtermbasedinvestment.saving.mapper.SubscriptionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -97,8 +98,10 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SubscriptionAggregate> findByStatus(SubscriptionStatus status) {
-        return jpaRepository.findByStatus(status)
+        return jpaRepository
+                .findByStatus(status)
                 .stream()
                 .map(SubscriptionMapper::toDomain)
                 .toList();
