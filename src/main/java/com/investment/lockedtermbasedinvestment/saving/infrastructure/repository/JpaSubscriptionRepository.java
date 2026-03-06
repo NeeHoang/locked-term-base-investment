@@ -18,6 +18,13 @@ import java.util.UUID;
 public interface JpaSubscriptionRepository extends JpaRepository<SubscriptionEntity, UUID> {
 
     @Query("""
+    SELECT s FROM SubscriptionEntity s
+    JOIN FETCH s.product
+    WHERE s.subscriptionId = :id
+""")
+    Optional<SubscriptionEntity> findByIdWithProduct(@Param("id") UUID id);
+
+    @Query("""
     select s
     from SubscriptionEntity s
     where s.subscriptionId = :subscriptionId

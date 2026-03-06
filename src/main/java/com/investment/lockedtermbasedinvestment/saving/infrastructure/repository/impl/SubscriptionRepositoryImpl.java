@@ -30,8 +30,10 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     private final JpaLockedProductRepository lockedProductRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<SubscriptionAggregate> findById(SubscriptionId id) {
-        return jpaRepository.findById(id.value())
+        return jpaRepository
+                .findByIdWithProduct(id.value())
                 .map(SubscriptionMapper::toDomain);
     }
 
