@@ -20,7 +20,7 @@ public class DailyInterestAccrualService {
     }
 
     @Scheduled(
-            cron = "0 30 10 * * *",
+            cron = "0 1 0 * * *",
             zone = "Asia/Ho_Chi_Minh"
     ) // second -> minute -> hour
     public void run() {
