@@ -36,7 +36,7 @@ public interface JpaSubscriptionRepository extends JpaRepository<SubscriptionEnt
     @Query("""
     SELECT s
     FROM SubscriptionEntity s
-    JOIN FETCH s.lockedProduct
+    JOIN FETCH s.product
     WHERE s.status = :status
 """)
     List<SubscriptionEntity> findByStatus(SubscriptionStatus status);
