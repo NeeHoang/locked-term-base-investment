@@ -20,9 +20,9 @@ public class DailyInterestAccrualService {
     }
 
     @Scheduled(
-            cron = "0 10 10 * * *",
+            cron = "0 30 10 * * *",
             zone = "Asia/Ho_Chi_Minh"
-    ) // 00:05 hang ngay
+    ) // second -> minute -> hour
     public void run() {
         LocalDate today = LocalDate.now(VN_ZONE);
         trigger(today);
