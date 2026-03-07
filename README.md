@@ -100,7 +100,7 @@ src/main/resources/db/migration/
 
 ---
 
-## 🔄 Daily Interest Accrual
+## 🔄 Daily Interest Accrual and Mature
 
 A scheduled CRON job runs every day at **00:05 (Asia/Ho_Chi_Minh)**:
 
