@@ -1,8 +1,6 @@
 package com.investment.lockedtermbasedinvestment.wallet.infrastructure.repository.impl;
 
 import com.investment.lockedtermbasedinvestment.wallet.domain.aggregate.WalletAggregate;
-import com.investment.lockedtermbasedinvestment.wallet.domain.exception.WalletErrorCode;
-import com.investment.lockedtermbasedinvestment.wallet.domain.exception.WalletException;
 import com.investment.lockedtermbasedinvestment.wallet.domain.repository.WalletRepository;
 import com.investment.lockedtermbasedinvestment.wallet.domain.valueobject.WalletId;
 import com.investment.lockedtermbasedinvestment.wallet.infrastructure.persistence.WalletEntity;

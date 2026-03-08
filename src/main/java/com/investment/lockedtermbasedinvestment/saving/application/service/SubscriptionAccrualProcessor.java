@@ -19,6 +19,9 @@ import com.investment.lockedtermbasedinvestment.saving.domain.repository.Subscri
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.EarningTransactionEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.persistence.InterestTransactionEntity;
 import com.investment.lockedtermbasedinvestment.saving.infrastructure.repository.JpaInterestTransactionRepository;
+import com.investment.lockedtermbasedinvestment.wallet.domain.aggregate.WalletAggregate;
+import com.investment.lockedtermbasedinvestment.wallet.domain.repository.WalletRepository;
+import com.investment.lockedtermbasedinvestment.wallet.domain.valueobject.WalletId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -37,6 +40,7 @@ public class SubscriptionAccrualProcessor {
     private final EarningRepository earningRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final LiquidityPoolRepository liquidityPoolRepository;
+    private final WalletRepository walletRepository;
     private final JpaLiquidityLedgerRepository liquidityLedgerRepository;
     private final JpaInterestTransactionRepository interestTxRepository;
     private final PenaltyPolicy penaltyPolicy;
@@ -140,6 +144,8 @@ public class SubscriptionAccrualProcessor {
 
     private void processMaturityStep(SubscriptionAggregate subscription,
                                      EarningAggregate earning) {
+
+
         Money before = earning.getAvailable();
 
         EarningTransactionEntity tx = earningTxStatusUpdater.getOrCreatePending(
@@ -155,6 +161,15 @@ public class SubscriptionAccrualProcessor {
 
             // Create record Liquidity Ledger
             processLiquidityDebit(principal, tx.getTxId(), LiquidityTransactionType.REDEEMED);
+
+            // Release frozen principal from available wallet
+            WalletAggregate wallet = walletRepository
+                    .findById(new WalletId(subscription.getWalletRef().value()))
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Wallet not found: " + subscription.getWalletRef().value()
+                    ));
+            wallet.releasePrincipalToEarning(principal);
+            walletRepository.save(wallet);
 
             // Update status EarningTransaction PENDING -> SUCCESS
             earningTxStatusUpdater.markSuccess(tx, principal, earning.getAvailable());
